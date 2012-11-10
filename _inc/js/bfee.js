@@ -66,7 +66,7 @@ jQuery(document).ready( function($) {
     }
 
     // Get the data and make sure WP Raptor doesn't nag for unsaved changes when we're saving
-    $('form#post').on('submit', function() {
+    $('form#post').bind('submit', function() {
         no_beforeonunload();
         contents_to_parent();
     });
@@ -85,7 +85,7 @@ jQuery(document).ready( function($) {
             document.getElementById('bfee-iframe').contentWindow.document.body.scrollTop = iframeScrollTop;
         else
             document.getElementById('bfee-iframe').contentWindow.document.body.scrollTop = iframe.contents().find('.bfee-editable-title').first().offset().top - 100;
-        
+
         iframe.fadeIn( function() {
             $(window).trigger('iframeLoaded');
         });

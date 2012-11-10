@@ -14,7 +14,7 @@ class BackToFrontEndEditor_UserSettings
 
     public function set_default_settings() {
         $user_id = get_current_user_id();
-        $settings = array ( "live_editing" => "false" );
+        $settings = array ( "live_editing" => false );
         update_user_meta ( $user_id, 'bfee', $settings );
         return $settings;
     }
