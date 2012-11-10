@@ -9,11 +9,14 @@
 
 define( 'IFRAME_REQUEST', true );
 
-global $bfee;
+// Go ahead and load all admin globals
+global $title, $hook_suffix, $current_screen, $wp_locale, $pagenow, $wp_version,
+	$current_site, $update_title, $total_update_count, $parent_file, $bfee;
 
 /**
  * START EDIT POST HEADER
  */
+
 $parent_file = 'edit.php';
 $submenu_file = 'edit.php';
 
@@ -211,7 +214,7 @@ do_action( 'bfee_init' );
 
 wp_enqueue_style( 'customize-controls' );
 
-global $current_user, $current_screen, $wp_locale;
+global $wp_locale;
 
 do_action( 'bfee_enqueue_scripts' );
 
@@ -236,11 +239,10 @@ $is_ios = wp_is_mobile() && preg_match( '/iPad|iPod|iPhone/', $_SERVER['HTTP_USE
 if ( $is_ios )
 	$body_class .= ' ios';
 
-//$admin_title = sprintf( __( '%1$s &#8212; WordPress' ), strip_tags( sprintf( __( 'Customize %s' ), $wp_customize->theme()->display('Name') ) ) );
-/**
- * @todo Set a nice title
- */
-$admin_title = "Edit Post";
+get_admin_page_title();
+$admin_title = sprintf( __( '%1$s &lsaquo; %2$s &#8212; WordPress' ), esc_html( strip_tags( $title ) ), get_bloginfo( 'name' ) );
+$admin_title = apply_filters( 'admin_title', $admin_title, $title );
+
 ?><title><?php echo $admin_title; ?></title><?php
 ?>
 <script type="text/javascript">
