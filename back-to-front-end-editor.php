@@ -231,7 +231,7 @@ if ( !class_exists ( 'BackToFrontEndEditor' ) ) :
          * @todo Post-type handling
          */
         public function new_post() {
-            $post_type = 'post';
+            $post_type = ( isset ( $_GET['post_type'] ) && ! empty ( $_GET['post_type'] ) ) ? $_GET['post_type'] : 'post';
             $post = get_default_post_to_edit( $post_type, true );
             $postarr = get_post ( $post->ID, 'ARRAY_A' );
             $postarr['post_status'] = 'draft';
@@ -247,7 +247,6 @@ if ( !class_exists ( 'BackToFrontEndEditor' ) ) :
         }
 
         /**
-         * @todo is this the way to set global $post?
          * @global type $post
          * @return type
          */
@@ -272,7 +271,6 @@ if ( !class_exists ( 'BackToFrontEndEditor' ) ) :
          * Load the template
          *
          * @since 0.1
-         * @todo Raptor doesn't include title editing.. shall we make our own?
          */
         protected function display() {
             $post_id = $post_ID = $this->post_id;
@@ -283,7 +281,7 @@ if ( !class_exists ( 'BackToFrontEndEditor' ) ) :
          * Enqueue scripts and styles
          *
          * @since 0.1
-         * @todo Choose Featured Image is no working
+         * @todo Choose Featured Image is no working @ WP 3.5beta
          */
         protected function enqueue_styles_and_scripts() {
             wp_enqueue_style("bfee", BFEE_INC_URL . 'css/bfee.css', array ("customize-controls"), "0.1" );
