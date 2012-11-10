@@ -227,9 +227,6 @@ if ( !class_exists ( 'BackToFrontEndEditor' ) ) :
             exit;
         }
 
-        /**
-         * @todo Post-type handling
-         */
         public function new_post() {
             $post_type = ( isset ( $_GET['post_type'] ) && ! empty ( $_GET['post_type'] ) ) ? $_GET['post_type'] : 'post';
             $post_type_object = get_post_type_object( $post_type );
