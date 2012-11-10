@@ -232,8 +232,11 @@ if ( !class_exists ( 'BackToFrontEndEditor' ) ) :
          */
         public function new_post() {
             $post_type = ( isset ( $_GET['post_type'] ) && ! empty ( $_GET['post_type'] ) ) ? $_GET['post_type'] : 'post';
+            $post_type_object = get_post_type_object( $post_type );
+            
             $post = get_default_post_to_edit( $post_type, true );
             $postarr = get_post ( $post->ID, 'ARRAY_A' );
+            $postarr['post_title'] = $post_type_object->labels->new_item;
             $postarr['post_status'] = 'draft';
             wp_update_post( $postarr );
 
