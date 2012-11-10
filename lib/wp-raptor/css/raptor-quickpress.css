@@ -1,0 +1,18 @@
+#dashboard_quick_press .textarea-wrap {
+    padding: 0;
+}
+
+#dashboard_quick_press .ui-editor-dock-docked-to-element-wrapper {
+    margin: 0!important;
+}
+
+#dashboard_quick_press .ui-editor-toolbar-wrapper {
+    background: url("images/ui-bg_highlight-soft_75_cccccc_1x100.png") repeat-x scroll 50% 50% #F8F8F8;
+    border: none;
+    border-bottom: 1px solid #ccc;
+}
+
+#dashboard_quick_press .ui-editor-dock-docked-element {
+    min-height: 200px;
+    padding: 0 5px!important;
+}

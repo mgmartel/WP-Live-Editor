@@ -1,0 +1,14 @@
+.ui-dialog, .ui-editor-wrapper {
+    z-index: 10000!important;
+}
+
+.ui-editor-toolbar-wrapper {
+    background-color: #f8f8f8!important;
+    background: none;
+    border: none;
+    border-bottom: 1px solid #ccc;
+}
+
+.ui-editor-link-content {
+    display: inline-block!important;
+}

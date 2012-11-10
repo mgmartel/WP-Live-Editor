@@ -1,0 +1,19 @@
+#post-body .ui-editor-dock-docked-to-element-wrapper {
+    margin: 0!important;
+}
+
+#post-body .ui-editor-toolbar-wrapper {
+    background: url("images/ui-bg_highlight-soft_75_cccccc_1x100.png") repeat-x scroll 50% 50% #F8F8F8;
+    border: none;
+    border-bottom: 1px solid #ccc;
+}
+
+#post-body .ui-editor-path {
+    background: none;
+    background-color: #EAEAEA;
+}
+
+#post-body .ui-editor-dock-docked-element {
+    min-height: 200px;
+    padding: 5px;
+}
