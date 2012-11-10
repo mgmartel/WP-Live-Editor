@@ -189,6 +189,11 @@ if ( !class_exists ( 'BackToFrontEndEditor' ) ) :
             if ( ! isset ( $_POST['is_bfee'] ) || ! $_POST['is_bfee'] == 'true' ) {
                 add_action ( 'redirect_post_location', array ( &$this, 'add_no_bfee_query_arg' ) );
             }
+
+            if ( $this->settings->is_default() && ( ! isset ( $_POST['is_bfee'] ) || ! $_POST['is_bfee'] == 'true' ) )
+                add_action ( 'redirect_post_location', array ( &$this, 'add_no_bfee_query_arg' ) );
+            elseif ( ! $this->settings->is_default() && isset ( $_POST['is_bfee'] ) && $_POST['is_bfee'] == 'true' )
+                add_action ( 'redirect_post_location', array ( &$this, 'add_bfee_query_arg' ) );
         }
 
         protected function no_bfee_redirects() {
