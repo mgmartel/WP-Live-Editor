@@ -231,7 +231,7 @@ if ( !class_exists ( 'BackToFrontEndEditor' ) ) :
          * @todo Post-type handling
          */
         public function new_post() {
-            $post_type = 'post';
+            $post_type = ( isset ( $_GET['post_type'] ) && ! empty ( $_GET['post_type'] ) ) ? $_GET['post_type'] : 'post';
             $post = get_default_post_to_edit( $post_type, true );
             $postarr = get_post ( $post->ID, 'ARRAY_A' );
             $postarr['post_status'] = 'draft';
