@@ -57,7 +57,7 @@ jQuery(document).ready( function($) {
     function contents_to_parent() {
         var contents = iframe.contents().find(".raptor-editable-post").html();
         hidden_content.val( contents );
-        var title = iframe.contents().find(".bfee-editable-title").text();
+        var title = iframe.contents().find(".bfee-editable-title").first().text();
         hidden_title.val( title );
     }
 
