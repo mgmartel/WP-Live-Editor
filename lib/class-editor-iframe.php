@@ -61,12 +61,13 @@ class BackToFrontEndEditor_Editor_iFrame
      * @todo Add FEE?
      */
     public function setup_editor() {
-        add_filter('_pre_option_raptor-settings', array ( &$this, 'bundled_raptor_settings' ) );
-
         wp_enqueue_script('bfee-in-place-init', BFEE_INC_URL . 'js/in-place.js', array ( 'jquery' ), '1.0.0', true);
+
         if ( defined ( 'RAPTOR_ROOT' ) ) {
-            // Add Raptor js
+            add_filter('_pre_option_raptor-settings', array ( &$this, 'bundled_raptor_settings' ) );
             add_action ( 'wp_print_scripts', array ( &$this, 'raptor_in_place_scripts' ), 11 );
+
+            add_filter('front_end_editor_allow_post', '__return_false', 10, 0);
         }
     }
 
