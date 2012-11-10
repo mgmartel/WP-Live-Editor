@@ -233,7 +233,7 @@ if ( !class_exists ( 'BackToFrontEndEditor' ) ) :
         public function new_post() {
             $post_type = ( isset ( $_GET['post_type'] ) && ! empty ( $_GET['post_type'] ) ) ? $_GET['post_type'] : 'post';
             $post_type_object = get_post_type_object( $post_type );
-            
+
             $post = get_default_post_to_edit( $post_type, true );
             $postarr = get_post ( $post->ID, 'ARRAY_A' );
             $postarr['post_title'] = $post_type_object->labels->new_item;
@@ -245,6 +245,8 @@ if ( !class_exists ( 'BackToFrontEndEditor' ) ) :
             // If BFEE is not the default editor, make sure the next screen shows BFEE
             if ( ! $this->settings->is_default() )
                 $post_link = $this->add_bfee_query_arg( $post_link );
+
+            $post_link = apply_filters ( 'bfee_new_post_redirect', $post_link, $post->ID );
 
             wp_redirect( $post_link );
         }
