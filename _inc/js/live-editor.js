@@ -1,12 +1,11 @@
-// BFEE
 jQuery(document).ready( function($) {
     var transport_refresh_buffer,
         transport_options = {},
         iframeScrollTop;
 
     // Get some vars from our template
-    var blog_url = bfee.blog_url,
-        post_url = bfee.post_url,
+    var blog_url = liveEditor.blog_url,
+        post_url = liveEditor.post_url,
         iframe = $('.wp-full-overlay-main iframe'),
         hidden_content = $("input#hidden_content"),
         hidden_title = $("input#hidden_title");
@@ -46,7 +45,7 @@ jQuery(document).ready( function($) {
         iframe.fadeOut();
         no_beforeonunload();
         contents_to_parent();
-        iframeScrollTop = document.getElementById('bfee-iframe').contentWindow.document.body.scrollTop;
+        iframeScrollTop = document.getElementById('live-editor-iframe').contentWindow.document.body.scrollTop;
 
         if ( transport_options ) var new_url = addQueryParams( transport_options, post_url );
         else new_url = post_url;
@@ -57,12 +56,12 @@ jQuery(document).ready( function($) {
     function contents_to_parent() {
         var contents = iframe.contents().find(".raptor-editable-post").html();
         hidden_content.val( contents );
-        var title = iframe.contents().find(".bfee-editable-title").first().text();
+        var title = iframe.contents().find(".live-editor-editable-title").first().text();
         hidden_title.val( title );
     }
 
     function no_beforeonunload() {
-        frames['bfee-iframe'].onbeforeunload = null;
+        frames['live-editor-iframe'].onbeforeunload = null;
     }
 
     // Get the data and make sure WP Raptor doesn't nag for unsaved changes when we're saving
@@ -82,9 +81,9 @@ jQuery(document).ready( function($) {
          * @todo This iframe scrolltop business is not working properly yet (because Raptor also tries to set the scrolltop?)
          */
         if ( iframeScrollTop )
-            document.getElementById('bfee-iframe').contentWindow.document.body.scrollTop = iframeScrollTop;
+            document.getElementById('live-editor-iframe').contentWindow.document.body.scrollTop = iframeScrollTop;
         else
-            document.getElementById('bfee-iframe').contentWindow.document.body.scrollTop = iframe.contents().find('.bfee-editable-title').first().offset().top - 100;
+            document.getElementById('live-editor-iframe').contentWindow.document.body.scrollTop = iframe.contents().find('.live-editor-editable-title').first().offset().top - 100;
 
         iframe.fadeIn( function() {
             $(window).trigger('iframeLoaded');
@@ -95,8 +94,8 @@ jQuery(document).ready( function($) {
     $(iframe).attr( "src", post_url );
 
     // Transport listeners
-    if ( typeof( bfee.metabox_transports ) != 'undefined' ) {
-        $.each( bfee.metabox_transports, function( metabox, transport ) {
+    if ( typeof( liveEditor.metabox_transports ) != 'undefined' ) {
+        $.each( liveEditor.metabox_transports, function( metabox, transport ) {
             $( "#" + metabox + " *").on("change", function() {
                 if ( ! $(this).val() ) return;
                 var transport_key = $(this).attr('name');

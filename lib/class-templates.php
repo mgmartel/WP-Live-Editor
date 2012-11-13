@@ -2,7 +2,7 @@
 if ( ! defined( 'ABSPATH' ) )
     exit(-1);
 
-class BackToFrontEndEditor_Templates
+class WP_LiveEditor_Templates
 {
 
     /**
@@ -111,9 +111,9 @@ class BackToFrontEndEditor_Templates
 
     public function save_button ( $post ) {
         if ( 'publish' != $post->post_status && 'future' != $post->post_status && 'pending' != $post->post_status ) { ?>
-        <input <?php if ( 'private' == $post->post_status ) { ?>style="display:none"<?php } ?> type="submit" name="save" id="save-post-bfee" value="<?php esc_attr_e('Save Draft'); ?>" class="button" />
+        <input <?php if ( 'private' == $post->post_status ) { ?>style="display:none"<?php } ?> type="submit" name="save" id="save-post-live-editor" value="<?php esc_attr_e('Save Draft'); ?>" class="button" />
         <?php } elseif ( 'pending' == $post->post_status && $can_publish ) { ?>
-        <input type="submit" name="save" id="save-post-bfee" value="<?php esc_attr_e('Save as Pending'); ?>" class="button" />
+        <input type="submit" name="save" id="save-post-live-editor" value="<?php esc_attr_e('Save as Pending'); ?>" class="button" />
         <?php }
     }
 }

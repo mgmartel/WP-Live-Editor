@@ -1,8 +1,8 @@
 <?php
 /*
-  Plugin Name: Back to Front End Editor
+  Plugin Name: Live Editor
   Plugin URI: http://trenvo.com
-  Description: None yet.
+  Description: Edit your posts on your website via the back-end with all the options of back-end editing
   Version: 0.1
   Author: Mike Martel
   Author URI: http://trenvo.com
@@ -17,22 +17,22 @@ if ( !defined ( 'ABSPATH' ) )
  *
  * @since 0.1
  */
-define ( 'BFEE_VERSION', '0.1' );
+define ( 'LIVE_EDITOR_VERSION', '0.1' );
 
 /**
  * PATHs and URLs
  *
  * @since 0.1
  */
-define ( 'BFEE_DIR', plugin_dir_path ( __FILE__ ) );
-define ( 'BFEE_URL', plugin_dir_url ( __FILE__ ) );
-define ( 'BFEE_INC_URL', BFEE_URL . '_inc/' );
+define ( 'LIVE_EDITOR_DIR', plugin_dir_path ( __FILE__ ) );
+define ( 'LIVE_EDITOR_URL', plugin_dir_url ( __FILE__ ) );
+define ( 'LIVE_EDITOR_INC_URL', LIVE_EDITOR_URL . '_inc/' );
 
 // Load iFrame class early enough
-if ( isset ( $_GET['bfee_preview'] ) && $_GET['bfee_preview'] == true )
-    require_once( BFEE_DIR . 'lib/class-editor-iframe.php' );
+if ( isset ( $_GET['live_editor_preview'] ) && $_GET['live_editor_preview'] == true )
+    require_once( LIVE_EDITOR_DIR . 'lib/class-editor-iframe.php' );
 
-if ( !class_exists ( 'BackToFrontEndEditor' ) ) :
+if ( !class_exists ( 'WP_LiveEditor' ) ) :
 
     /**
      * The masterclass
@@ -40,7 +40,7 @@ if ( !class_exists ( 'BackToFrontEndEditor' ) ) :
      * @todo Open boxes based on cookie
      * @todo Handle autosaves / revisions (autosave triggers content-to-parent)
      */
-    class BackToFrontEndEditor
+    class WP_LiveEditor
     {
 
         public $metabox_transports = array();
@@ -48,21 +48,21 @@ if ( !class_exists ( 'BackToFrontEndEditor' ) ) :
         public $templates;
 
         /**
-         * Creates an instance of the BackToFrontEndEditor class
+         * Creates an instance of the WP_LiveEditor class
          *
-         * @return BackToFrontEndEditor object
+         * @return WP_LiveEditor object
          * @since 0.1
          * @static
         */
         public static function &init() {
-            global $bfee;
+            global $live_editor;
 
-            if ( !$bfee ) {
-                load_plugin_textdomain ( 'bfee', false, BFEE_DIR . '/languages/' );
-                $bfee = new BackToFrontEndEditor;
+            if ( !$live_editor ) {
+                load_plugin_textdomain ( 'live-editor', false, LIVE_EDITOR_DIR . '/languages/' );
+                $live_editor = new WP_LiveEditor;
             }
 
-            return $bfee;
+            return $live_editor;
         }
 
         /**
@@ -75,19 +75,19 @@ if ( !class_exists ( 'BackToFrontEndEditor' ) ) :
 
             if ( ! is_user_logged_in() ) return;
 
-            require_once ( BFEE_DIR . 'lib/class-templates.php' );
-            $this->templates = new BackToFrontEndEditor_Templates;
+            require_once ( LIVE_EDITOR_DIR . 'lib/class-templates.php' );
+            $this->templates = new WP_LiveEditor_Templates;
 
-            require_once ( BFEE_DIR . 'lib/class-settings.php' );
-            $this->settings = new BackToFrontEndEditor_UserSettings;
+            require_once ( LIVE_EDITOR_DIR . 'lib/class-settings.php' );
+            $this->settings = new WP_LiveEditor_UserSettings;
 
-            require_once ( BFEE_DIR . 'lib/class.wp-help-pointers.php' );
+            require_once ( LIVE_EDITOR_DIR . 'lib/class.wp-help-pointers.php' );
 
             $this->actions_and_filters();
 
             // Make sure we redirect to the right editing interface
             if ( isset ( $_POST['action'] ) && $_POST['action'] == "editpost" )
-                $this->bfee_redirects();
+                $this->live_editor_redirects();
 
             add_action ( 'admin_init', array ( &$this, 'setup' ), 11 );
 
@@ -98,7 +98,7 @@ if ( !class_exists ( 'BackToFrontEndEditor' ) ) :
              *
              * @since 0.1
              */
-            public function backtofrontendeditor() {
+            public function wpliveeditor() {
                 $this->__construct ();
             }
 
@@ -107,15 +107,15 @@ if ( !class_exists ( 'BackToFrontEndEditor' ) ) :
                 return $this->active;
 
             $is_default = $this->settings->is_default();
-            $is_deactivated = ( isset($_REQUEST['no_bfee']) && $_REQUEST['no_bfee'] == true  );
-            $is_activated = ( isset($_REQUEST['bfee']) && $_REQUEST['bfee'] == true  );
+            $is_deactivated = ( isset($_REQUEST['live_off']) && $_REQUEST['live_off'] == true  );
+            $is_activated = ( isset($_REQUEST['live']) && $_REQUEST['live'] == true  );
 
             if ( $is_default )
                 $this->active = ( ! $is_deactivated );
             elseif ( ! $is_default )
                 $this->active = ( $is_activated );
 
-            return apply_filters ( 'bfee_is_active', &$this->active );
+            return apply_filters ( 'live_editor_is_active', &$this->active );
         }
 
         public function setup() {
@@ -142,18 +142,18 @@ if ( !class_exists ( 'BackToFrontEndEditor' ) ) :
         public function set_pointers() {
             $pointers = array(
                     array(
-                        'id' => 'bfee_intor',
+                        'id' => 'live_editor_intro',
                         'screen' => 'post',
                         'target' => '#content-html',
-                        'title' => __ ( 'Live Editing', 'bfee' ),
-                        'content' => __( 'You have installed Back to Front End Editor, which enables Live editing of your WordPress pages and posts. Click the \'Live\' tab here, or go to your user profile to set the Live Editor as your default editor.', 'bfee' ),
+                        'title' => __ ( 'Live Editing', 'live-editor' ),
+                        'content' => __( 'You have installed Live Editor. Click the \'Live\' tab here, or go to your user profile to set the Live Editor as your default editor.', 'live-editor' ),
                         'position' => array(
                                 'edge' => 'top',
                                 'align' => 'center'
                             )
                         )
                     );
-            $pointers = apply_filters( 'bfee_pointers', $pointers );
+            $pointers = apply_filters( 'live_editor_pointers', $pointers );
             new WP_Help_Pointer($pointers);
         }
 
@@ -163,7 +163,7 @@ if ( !class_exists ( 'BackToFrontEndEditor' ) ) :
          */
         public function switch_interface_button() {
             ?>
-            <a class="button" href="<?php echo $this->add_bfee_query_arg(); ?>" style='margin-bottom: 12px'>
+            <a class="button" href="<?php echo $this->add_live_editor_query_arg(); ?>" style='margin-bottom: 12px'>
                 <?php _e( 'Switch interface' ); ?>
             </a>
             <?php
@@ -172,7 +172,7 @@ if ( !class_exists ( 'BackToFrontEndEditor' ) ) :
         public function add_live_mce_tab() {
             echo "
                 <script>
-                    jQuery('.wp-switch-editor#content-tmce').after(\"<a id='content-live' class='hide-if-no-js wp-switch-editor switch-live' href='" . $this->add_bfee_query_arg() . "' style='text-decoration:none'>Live</a>\");
+                    jQuery('.wp-switch-editor#content-tmce').after(\"<a id='content-live' class='hide-if-no-js wp-switch-editor switch-live' href='" . $this->add_live_editor_query_arg() . "' style='text-decoration:none'>Live</a>\");
                 </script>
                 ";
 
@@ -180,39 +180,39 @@ if ( !class_exists ( 'BackToFrontEndEditor' ) ) :
 
         protected function actions_and_filters() {
             // We'll load our own scripts
-            add_action ( "bfee_print_scripts", array ( &$this, "print_header_scripts" ) );
-            add_action ( "bfee_print_footer_scripts", array ( &$this, "print_scripts" ) );
+            add_action ( "live_editor_print_scripts", array ( &$this, "print_header_scripts" ) );
+            add_action ( "live_editor_print_footer_scripts", array ( &$this, "print_scripts" ) );
 
         }
 
-        protected function bfee_redirects() {
-            if ( ! isset ( $_POST['is_bfee'] ) || ! $_POST['is_bfee'] == 'true' ) {
-                add_action ( 'redirect_post_location', array ( &$this, 'add_no_bfee_query_arg' ) );
+        protected function live_editor_redirects() {
+            if ( ! isset ( $_POST['live'] ) || ! $_POST['live'] == 'true' ) {
+                add_action ( 'redirect_post_location', array ( &$this, 'add_no_live_editor_query_arg' ) );
             }
 
-            if ( $this->settings->is_default() && ( ! isset ( $_POST['is_bfee'] ) || ! $_POST['is_bfee'] == 'true' ) )
-                add_action ( 'redirect_post_location', array ( &$this, 'add_no_bfee_query_arg' ) );
-            elseif ( ! $this->settings->is_default() && isset ( $_POST['is_bfee'] ) && $_POST['is_bfee'] == 'true' )
-                add_action ( 'redirect_post_location', array ( &$this, 'add_bfee_query_arg' ) );
+            if ( $this->settings->is_default() && ( ! isset ( $_POST['live'] ) || ! $_POST['live'] == 'true' ) )
+                add_action ( 'redirect_post_location', array ( &$this, 'add_no_live_editor_query_arg' ) );
+            elseif ( ! $this->settings->is_default() && isset ( $_POST['live'] ) && $_POST['live'] == 'true' )
+                add_action ( 'redirect_post_location', array ( &$this, 'add_live_editor_query_arg' ) );
         }
 
-        protected function no_bfee_redirects() {
-            add_action ( 'redirect_post_location', array ( &$this, 'add_no_bfee_query_arg' ) );
+        protected function no_live_editor_redirects() {
+            add_action ( 'redirect_post_location', array ( &$this, 'add_no_live_editor_query_arg' ) );
         }
 
-        public function add_bfee_query_arg( $url = '' ) {
+        public function add_live_editor_query_arg( $url = '' ) {
             if ( empty ( $url ) ) {
                 $url = $_SERVER["REQUEST_URI"];
             }
 
-            return add_query_arg( 'bfee' , 1, remove_query_arg ('no_bfee', $url ) );
+            return add_query_arg( 'live' , 1, remove_query_arg ('live_off', $url ) );
         }
 
-        public function add_no_bfee_query_arg( $url = '' ) {
+        public function add_no_live_editor_query_arg( $url = '' ) {
             if ( empty ( $url ) ) {
                 $url = $_SERVER["REQUEST_URI"];
             }
-            return add_query_arg( 'no_bfee' , 1, remove_query_arg ('bfee', $url ) );
+            return add_query_arg( 'live_off' , 1, remove_query_arg ('live', $url ) );
         }
 
         public function live() {
@@ -220,8 +220,8 @@ if ( !class_exists ( 'BackToFrontEndEditor' ) ) :
             $this->enqueue_styles_and_scripts();
             $this->set_vars();
 
-            require_once ( BFEE_DIR . 'lib/meta-box-transports.php' );
-            do_action ( 'bfee_add_metabox_transports', &$this );
+            require_once ( LIVE_EDITOR_DIR . 'lib/meta-box-transports.php' );
+            do_action ( 'live_editor_add_metabox_transports', &$this );
 
             $this->display();
             exit;
@@ -239,11 +239,11 @@ if ( !class_exists ( 'BackToFrontEndEditor' ) ) :
 
             $post_link = get_edit_post_link( $post->ID, '' );
 
-            // If BFEE is not the default editor, make sure the next screen shows BFEE
+            // If Live Editor is not the default editor, make sure the next screen shows Live Editor
             if ( ! $this->settings->is_default() )
-                $post_link = $this->add_bfee_query_arg( $post_link );
+                $post_link = $this->add_live_editor_query_arg( $post_link );
 
-            $post_link = apply_filters ( 'bfee_new_post_redirect', $post_link, $post->ID );
+            $post_link = apply_filters ( 'live_editor_new_post_redirect', $post_link, $post->ID );
 
             wp_redirect( $post_link );
         }
@@ -276,7 +276,7 @@ if ( !class_exists ( 'BackToFrontEndEditor' ) ) :
          */
         protected function display() {
             $post_id = $post_ID = $this->post_id;
-            require( BFEE_DIR . '/template.php' );
+            require( LIVE_EDITOR_DIR . '/template.php' );
         }
 
         /**
@@ -286,8 +286,8 @@ if ( !class_exists ( 'BackToFrontEndEditor' ) ) :
          * @todo Choose Featured Image is no working @ WP 3.5beta
          */
         protected function enqueue_styles_and_scripts() {
-            wp_enqueue_style("bfee", BFEE_INC_URL . 'css/bfee.css', array ("customize-controls"), "0.1" );
-            wp_enqueue_script("bfee", BFEE_INC_URL . 'js/bfee.js', array ("jquery", "utils", "wp-lists", "suggest", "media-upload" ), "0.1" );
+            wp_enqueue_style("live-editor", LIVE_EDITOR_INC_URL . 'css/live-editor.css', array ("customize-controls"), "0.1" );
+            wp_enqueue_script("live-editor", LIVE_EDITOR_INC_URL . 'js/live-editor.js', array ("jquery", "utils", "wp-lists", "suggest", "media-upload" ), "0.1" );
         }
 
         public function print_header_scripts() {
@@ -301,15 +301,15 @@ if ( !class_exists ( 'BackToFrontEndEditor' ) ) :
          */
         public function print_scripts() {
             $post_url = get_permalink ( $this->post_id );
-            $iframe_url = add_query_arg( "bfee_preview", "1", $post_url );
+            $iframe_url = add_query_arg( "live_editor_preview", "1", $post_url );
 
-            $args = apply_filters ( 'bfee_js_vars', array (
+            $args = apply_filters ( 'live_editor_js_vars', array (
                 "blog_url"                 => get_bloginfo('url'),
                 "post_url"                 => $iframe_url,
                 "metabox_transports"       => $this->metabox_transports
             ) );
 
-            wp_localize_script( "bfee", "bfee", $args);
+            wp_localize_script( "live-editor", "liveEditor", $args);
 
             $post_l10n = array(
                 'publishOn' => __('Publish on:'),
@@ -331,9 +331,9 @@ if ( !class_exists ( 'BackToFrontEndEditor' ) ) :
                 'comma' => _x( ',', 'tag delimiter' ),
             );
 
-            wp_localize_script( "bfee", "postL10n", $post_l10n);
+            wp_localize_script( "live-editor", "postL10n", $post_l10n);
 
-            wp_print_scripts( array ('bfee') );
+            wp_print_scripts( array ('live-editor') );
         }
 
         public function add_metabox_transport( $metabox, $transport ) {
@@ -341,5 +341,5 @@ if ( !class_exists ( 'BackToFrontEndEditor' ) ) :
         }
 
     }
-    add_action ('init', array ( "BackToFrontEndEditor", "init" ) );
+    add_action ('init', array ( "WP_LiveEditor", "init" ) );
 endif;
