@@ -1,17 +1,15 @@
 <?php
 /**
- * Customize Controls
+ * Live Editor Template
  *
- * @package WordPress
- * @subpackage Customize
- * @since 3.4.0
+ * @since 0.1
  */
 
 define( 'IFRAME_REQUEST', true );
 
 // Go ahead and load all admin globals
 global $title, $hook_suffix, $current_screen, $wp_locale, $pagenow, $wp_version,
-	$current_site, $update_title, $total_update_count, $parent_file, $bfee;
+	$current_site, $update_title, $total_update_count, $parent_file, $live_editor;
 
 /**
  * START EDIT POST HEADER
@@ -205,18 +203,18 @@ $registered = $wp_scripts->registered;
 $wp_scripts = new WP_Scripts;
 $wp_scripts->registered = $registered;
 
-add_action( 'bfee_print_scripts',        'print_head_scripts', 20 );
-add_action( 'bfee_print_footer_scripts', '_wp_footer_scripts'     );
-add_action( 'bfee_print_footer_scripts', 'print_footer_scripts'     );
-add_action( 'bfee_print_styles',         'print_admin_styles', 20 );
+add_action( 'live_editor_print_scripts',        'print_head_scripts', 20 );
+add_action( 'live_editor_print_footer_scripts', '_wp_footer_scripts'     );
+add_action( 'live_editor_print_footer_scripts', 'print_footer_scripts'     );
+add_action( 'live_editor_print_styles',         'print_admin_styles', 20 );
 
-do_action( 'bfee_init' );
+do_action( 'live_editor_init' );
 
 wp_enqueue_style( 'customize-controls' );
 
 global $wp_locale;
 
-do_action( 'bfee_enqueue_scripts' );
+do_action( 'live_editor_enqueue_scripts' );
 
 // Let's roll.
 @header('Content-Type: ' . get_option('html_type') . '; charset=' . get_option('blog_charset'));
@@ -261,8 +259,8 @@ var userSettings = {
 </script>
 <?php
 
-do_action( 'bfee_print_styles' );
-do_action( 'bfee_print_scripts' );
+do_action( 'live_editor_print_styles' );
+do_action( 'live_editor_print_scripts' );
 
 
 ?>
@@ -274,11 +272,9 @@ do_action( 'bfee_print_scripts' );
 
 <div class="wp-full-overlay expanded">
 
-	<!--<form id="bfee-controls" class="wrap wp-full-overlay-sidebar">-->
-
-    <form name="post" action="post.php?bfee=1" method="post" id="post"<?php do_action('post_edit_form_tag'); ?>  class="wrap wp-full-overlay-sidebar">
+    <form name="post" action="post.php?live=1" method="post" id="post"<?php do_action('post_edit_form_tag'); ?>  class="wrap wp-full-overlay-sidebar">
     <?php wp_nonce_field($nonce_action); ?>
-    <input type="hidden" id="is-bfee" name="is_bfee" value="true" />
+    <input type="hidden" id="is-live" name="live" value="true" />
     <input type="hidden" id="user-id" name="user_ID" value="<?php echo (int) $user_ID ?>" />
     <input type="hidden" id="hiddenaction" name="action" value="<?php echo esc_attr( $form_action ) ?>" />
     <input type="hidden" id="originalaction" name="originalaction" value="<?php echo esc_attr( $form_action ) ?>" />
@@ -304,16 +300,16 @@ do_action( 'bfee_print_scripts' );
     <input type="hidden" name="post_title" id="hidden_title">
     <input type="hidden" name="content" id="hidden_content">
 
-		<div id="bfee-header-actions" class="wp-full-overlay-header">
+		<div id="live-editor-header-actions" class="wp-full-overlay-header">
 
-            <?php $bfee->templates->publish_button ( $post ); ?>
+            <?php $live_editor->templates->publish_button ( $post ); ?>
             <span class="spinner"></span>
 
             <a class="back button" href="<?php echo esc_url( $return ? $return : admin_url( 'edit.php' ) ); ?>">
                 <?php _e( 'Cancel' ); ?>
             </a>
 
-            <?php $bfee->templates->save_button( $post ); ?>
+            <?php $live_editor->templates->save_button( $post ); ?>
 
 		</div>
 
@@ -326,18 +322,18 @@ do_action( 'bfee_print_scripts' );
             <div id="message" class="updated"><p><?php echo $message; ?></p></div>
             <?php endif; ?>
 
-			<div id="bfee-theme-controls" ><ul>
-                    <?php require ( BFEE_DIR . 'lib/meta-boxes.php' ); ?>
+			<div id="live-editor-theme-controls" ><ul>
+                    <?php require ( LIVE_EDITOR_DIR . 'lib/meta-boxes.php' ); ?>
 			</ul></div>
 		</div>
 
-		<div id="bfee-footer-actions" class="wp-full-overlay-footer">
+		<div id="live-editor-footer-actions" class="wp-full-overlay-footer">
 			<a href="#" class="collapse-sidebar button-secondary" title="<?php esc_attr_e('Collapse Sidebar'); ?>">
 				<span class="collapse-sidebar-arrow"></span>
 				<span class="collapse-sidebar-label"><?php _e('Collapse'); ?></span>
 			</a>
 
-            <a class="button" href="<?php echo $bfee->add_no_bfee_query_arg(); ?>" style="
+            <a class="button" href="<?php echo $live_editor->add_no_live_editor_query_arg(); ?>" style="
                position: absolute;
                 bottom: 9px;
                 right: 16px;
@@ -346,12 +342,12 @@ do_action( 'bfee_print_scripts' );
             </a>
 		</div>
 	</form>
-	<div id="bfee-preview" class="wp-full-overlay-main">
-        <iframe width="100%" height="100%" frameborder="0" scrolling="auto" src="" name="bfee-iframe" id="bfee-iframe"></iframe>
+	<div id="live-editor-preview" class="wp-full-overlay-main">
+        <iframe width="100%" height="100%" frameborder="0" scrolling="auto" src="" name="live-editor-iframe" id="live-editor-iframe"></iframe>
     </div>
 	<?php
 
-	do_action( 'bfee_print_footer_scripts' );
+	do_action( 'live_editor_print_footer_scripts' );
 	do_action( 'admin_footer' );
 
     ?>

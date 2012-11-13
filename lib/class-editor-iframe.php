@@ -2,31 +2,35 @@
 if ( ! defined('ABSPATH' ) )
     exit(-1);
 
-require_once ( BFEE_DIR . 'lib/meta-box-transports.php' );
+require_once ( LIVE_EDITOR_DIR . 'lib/meta-box-transports.php' );
 
-class BackToFrontEndEditor_Editor_iFrame
+class WP_LiveEditor_iFrame
 {
     public function __construct() {
         if ( ! $this->raptor_is_active () ) {
-            require_once ( BFEE_DIR . 'lib/wp-raptor/index.php');
+            require_once ( LIVE_EDITOR_DIR . 'lib/wp-raptor/index.php');
         }
 
         add_action('setup_theme', array ( &$this, 'hide_admin_bar' ) );
         add_action('plugins_loaded', array ( &$this, 'setup_editor' ) );
         add_action('wp_print_styles', array ( &$this, 'try_hide_edit_links' ) );
-        add_action('wp_print_footer_scripts', array ( &$this, 'bfee_preview_iframe_styles' ) );
+        add_action('wp_print_footer_scripts', array ( &$this, 'live_editor_preview_iframe_styles' ) );
 
         add_filter ('the_title', array ( &$this, 'enclose_titles' ), 10, 2 );
 
         $this->do_iframe_actions();
     }
 
+        function wp_liveeditor_iframe() {
+            $this->_construct();
+        }
+
     protected function do_iframe_actions() {
         add_action ( 'init', array ( &$this, 'iframe_init' ) );
     }
 
     public function iframe_init() {
-        do_action('bfee_iframe_init');
+        do_action('live_editor_iframe_init');
     }
 
     public function enclose_titles($title, $id) {
@@ -35,7 +39,7 @@ class BackToFrontEndEditor_Editor_iFrame
         if ( ! in_the_loop() || $id != $post->ID ) return $title;
 
         if(current_user_can('edit_post', $post->ID)) {
-            $title = "<div class='bfee-editable-title' contenteditable=true data-post_id='{$post->ID}'>{$title}</div>";
+            $title = "<div class='live-editor-editable-title' contenteditable=true data-post_id='{$post->ID}'>{$title}</div>";
         }
 
         return $title;
@@ -61,7 +65,7 @@ class BackToFrontEndEditor_Editor_iFrame
      * @todo Add FEE?
      */
     public function setup_editor() {
-        wp_enqueue_script('bfee-in-place-init', BFEE_INC_URL . 'js/in-place.js', array ( 'jquery' ), '1.0.0', true);
+        wp_enqueue_script('live-editor-in-place-init', LIVE_EDITOR_INC_URL . 'js/in-place.js', array ( 'jquery' ), '1.0.0', true);
 
         if ( defined ( 'RAPTOR_ROOT' ) ) {
             add_filter('_pre_option_raptor-settings', array ( &$this, 'bundled_raptor_settings' ) );
@@ -76,8 +80,8 @@ class BackToFrontEndEditor_Editor_iFrame
      */
     public function raptor_in_place_scripts() {
         wp_dequeue_script( 'raptor-in-place-init' );
-        wp_enqueue_script('bfee-raptor-in-place-init', BFEE_INC_URL . 'js/raptor.js', array ( 'raptor', 'jquery' ), '1.0.0', true);
-        wp_localize_script('bfee-raptor-in-place-init', 'raptorInPlace',
+        wp_enqueue_script('live-editor-raptor-in-place-init', LIVE_EDITOR_INC_URL . 'js/raptor.js', array ( 'raptor', 'jquery' ), '1.0.0', true);
+        wp_localize_script('live-editor-raptor-in-place-init', 'raptorInPlace',
                 array(
                     'url' => admin_url('admin-ajax.php'),
                     'nonce' => wp_create_nonce(RaptorSave::SAVE_POSTS_NONCE),
@@ -96,13 +100,13 @@ class BackToFrontEndEditor_Editor_iFrame
         echo "<style>.edit-link, .post-edit-link, .comment-edit-link {display:none;}</style>";
     }
 
-    public function bfee_preview_iframe_styles() {
+    public function live_editor_preview_iframe_styles() {
         echo "<style>
             .raptor-editable-post,
-            /*.bfee-editable-title */
+            /*.live-editor-editable-title */
                 {outline:1px dashed rgba(0, 0, 0, 0.5);}
             .raptor-editable-post:focus,
-            /*.bfee-editable-title:focus */
+            /*.live-editor-editable-title:focus */
                 {outline:none;}
             .ui-editor-dock-docked .ui-editor-toolbar-wrapper { min-height: 44px; background-color: #f5f5f5 !important;
         </style>";
@@ -128,4 +132,4 @@ class BackToFrontEndEditor_Editor_iFrame
 
 
 }
-new BackToFrontEndEditor_Editor_iFrame;
+new WP_LiveEditor_iFrame;

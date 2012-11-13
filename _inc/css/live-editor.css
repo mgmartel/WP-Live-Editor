@@ -14,21 +14,21 @@
     margin: 10px;
 }
 
-#bfee-header-actions .button-primary {
+#live-editor-header-actions .button-primary {
     float: right;
     margin-top: 10px;
 }
 
-.saving #bfee-header-actions .spinner {
+.saving #live-editor-header-actions .spinner {
 	display: block;
 }
 
-#bfee-header-actions .spinner {
+#live-editor-header-actions .spinner {
     margin-top: 16px;
     margin-right: 4px;
 }
 
-#bfee-theme-controls > ul {
+#live-editor-theme-controls > ul {
     margin: 0;
 }
 
