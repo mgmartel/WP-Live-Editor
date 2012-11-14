@@ -10,13 +10,6 @@ jQuery(document).ready( function($) {
         hidden_content = $("input#hidden_content"),
         hidden_title = $("input#hidden_title");
 
-    function addQueryParams( params, url ) {
-        $.each(params, function( key, value) {
-            url = addQueryParam (key, value, url);
-        })
-        return url;
-    }
-
     function addQueryParam(key, value, url) {
         if (!url) url = window.location.href;
         var re = new RegExp("([?|&])" + key + "=.*?(&|#|$)", "gi");
@@ -47,7 +40,7 @@ jQuery(document).ready( function($) {
         contents_to_parent();
         iframeScrollTop = document.getElementById('live-editor-iframe').contentWindow.document.body.scrollTop;
 
-        if ( transport_options ) var new_url = addQueryParams( transport_options, post_url );
+        if ( transport_options ) var new_url = addQueryParam( 'live-editor-transport', JSON.stringify ( transport_options ), post_url );
         else new_url = post_url;
 
         $(iframe).attr( "src", new_url );
