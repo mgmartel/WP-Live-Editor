@@ -5,7 +5,7 @@ if ( ! defined('ABSPATH' ) )
 require_once ( LIVE_EDITOR_DIR . 'lib/meta-box-transports.php' );
 
 if ( !class_exists ( 'WP_LiveEditor_iFrame' ) ) :
-    
+
     class WP_LiveEditor_iFrame
     {
 
@@ -35,6 +35,10 @@ if ( !class_exists ( 'WP_LiveEditor_iFrame' ) ) :
 
             if ( isset ( $_GET['live-editor-transport'] ) && ! empty ( $_GET['live-editor-transport'] ) )
                 $this->transport_params = json_decode ( $_GET['live-editor-transport'], true );
+
+            foreach ( $this->transport_params as $key => $param ) {
+                do_action ('live_editor_transports-' . $key, $param );
+            }
 
             add_action('setup_theme', array ( &$this, 'hide_admin_bar' ) );
             add_action('plugins_loaded', array ( &$this, 'setup_editor' ) );
