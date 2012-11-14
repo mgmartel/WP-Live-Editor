@@ -341,7 +341,7 @@ if ( !class_exists ( 'WP_LiveEditor' ) ) :
             wp_print_scripts( array ('live-editor') );
         }
 
-        public function add_metabox_transport( $metabox, $transport ) {
+        public function add_metabox_transport( $metabox, $transport = 'refresh' ) {
             $this->metabox_transports[$metabox] = $transport;
         }
 
