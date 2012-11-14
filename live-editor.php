@@ -125,8 +125,11 @@ if ( !class_exists ( 'WP_LiveEditor' ) ) :
 
             if ( ! $active ) {
                 if ( $pagenow == 'post.php' ) {
-                    //add_action('submitpage_box', array ( &$this, 'switch_interface_button' ), 1 );
-                    //add_action('submitpost_box', array ( &$this, 'switch_interface_button' ), 1 );
+                    if ( get_user_meta ( get_current_user_id(), 'rich_editing', true ) == "false" ) {
+                        add_action('submitpage_box', array ( &$this, 'switch_interface_button' ), 1 );
+                        add_action('submitpost_box', array ( &$this, 'switch_interface_button' ), 1 );
+                    }
+
                     add_action('admin_print_footer_scripts', array ( &$this, 'add_live_mce_tab' ) );
                     if ( ! $this->settings->is_default() )
                         add_action ( 'admin_enqueue_scripts', array ( &$this, 'set_pointers' ) );
@@ -164,7 +167,7 @@ if ( !class_exists ( 'WP_LiveEditor' ) ) :
         public function switch_interface_button() {
             ?>
             <a class="button" href="<?php echo $this->add_live_editor_query_arg(); ?>" style='margin-bottom: 12px'>
-                <?php _e( 'Switch interface' ); ?>
+                <?php _e( 'Use Live Editor', 'bfee' ); ?>
             </a>
             <?php
         }
