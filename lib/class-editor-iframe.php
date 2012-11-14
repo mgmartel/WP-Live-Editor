@@ -104,9 +104,6 @@ if ( !class_exists ( 'WP_LiveEditor_iFrame' ) ) :
             }
         }
 
-        /**
-         * @todo get allowOversizeImages from Raptor
-         */
         public function raptor_in_place_scripts() {
             wp_dequeue_script( 'raptor-in-place-init' );
             wp_enqueue_script('live-editor-raptor-in-place-init', LIVE_EDITOR_INC_URL . 'js/raptor.js', array ( 'raptor', 'jquery' ), '1.0.0', true);
@@ -115,8 +112,7 @@ if ( !class_exists ( 'WP_LiveEditor_iFrame' ) ) :
                         'url' => admin_url('admin-ajax.php'),
                         'nonce' => wp_create_nonce(RaptorSave::SAVE_POSTS_NONCE),
                         'action' => RaptorSave::SAVE_POSTS,
-                        'allowOversizeImages' => true
-                        //'allowOversizeImages' => $raptor->options->resizeImagesAutomatically()
+                        'allowOversizeImages' => 1,
                     ));
         }
 
@@ -131,11 +127,11 @@ if ( !class_exists ( 'WP_LiveEditor_iFrame' ) ) :
 
         public function live_editor_preview_iframe_styles() {
             echo "<style>
-                .raptor-editable-post,
                 /*.live-editor-editable-title */
+                .raptor-editable-post
                     {outline:1px dashed rgba(0, 0, 0, 0.5);}
-                .raptor-editable-post:focus,
                 /*.live-editor-editable-title:focus */
+                .raptor-editable-post:focus
                     {outline:none;}
                 .ui-editor-dock-docked .ui-editor-toolbar-wrapper { min-height: 44px; background-color: #f5f5f5 !important;
             </style>";
