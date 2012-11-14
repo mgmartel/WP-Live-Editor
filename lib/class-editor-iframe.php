@@ -90,9 +90,6 @@ if ( !class_exists ( 'WP_LiveEditor_iFrame' ) ) :
             return false;
         }
 
-        /**
-         * @todo Add FEE?
-         */
         public function setup_editor() {
             wp_enqueue_script('live-editor-in-place-init', LIVE_EDITOR_INC_URL . 'js/in-place.js', array ( 'jquery' ), '1.0.0', true);
 
@@ -141,7 +138,6 @@ if ( !class_exists ( 'WP_LiveEditor_iFrame' ) ) :
          *
          * @param array $options
          * @return string
-         * @todo properly test this
          */
         public function bundled_raptor_settings( $options) {
             $options = array(
