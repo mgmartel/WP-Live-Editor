@@ -2,7 +2,7 @@
 /*
   Plugin Name: Live Editor
   Plugin URI: http://trenvo.com
-  Description: Edit your posts on your website via the back-end with all the options of back-end editing
+  Description: Front-end editing with back-end flexibility
   Version: 0.1
   Author: Mike Martel
   Author URI: http://trenvo.com
