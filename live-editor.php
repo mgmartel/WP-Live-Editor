@@ -29,8 +29,10 @@ define ( 'LIVE_EDITOR_URL', plugin_dir_url ( __FILE__ ) );
 define ( 'LIVE_EDITOR_INC_URL', LIVE_EDITOR_URL . '_inc/' );
 
 // Load iFrame class early enough
-if ( isset ( $_GET['live_editor_preview'] ) && $_GET['live_editor_preview'] == true )
+if ( isset ( $_GET['live_editor_preview'] ) && $_GET['live_editor_preview'] == true ) {
     require_once( LIVE_EDITOR_DIR . 'lib/class-editor-iframe.php' );
+    return;
+}
 
 if ( !class_exists ( 'WP_LiveEditor' ) ) :
 
