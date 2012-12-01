@@ -1,0 +1,52 @@
+.wp-full-overlay-main {
+    background: url('../img/wpspin_light.gif') 50% 50% no-repeat;
+}
+
+.wp-full-overlay {
+    z-index: 99;
+}
+
+.wp-full-overlay-main iframe {
+    display: none;
+}
+
+.wrap div.updated, .wrap div.error, .media-upload-form div.error {
+    margin: 10px;
+}
+
+#live-admin-header-actions .button-primary {
+    float: right;
+    margin-top: 10px;
+}
+
+#live-admin-theme-controls > ul {
+    margin: 0;
+}
+
+.spinner {
+    background: url(../img/wpspin_light.gif) no-repeat;
+    background-size: 16px 16px;
+    display: none;
+    float: right;
+    opacity: 0.7;
+    filter: alpha(opacity=70);
+    width: 16px;
+    height: 16px;
+    margin: 5px 5px 0;
+}
+
+#wpwrap { width: inherit; }
+
+.wp-full-overlay.expanded .hide-when-expanded {
+    display: none;
+}
+
+a.collapse-sidebar span.button {
+    margin-left: 23px;
+}
+
+a.collapse-sidebar + a.button {
+    position: absolute;
+    bottom: 9px;
+    right: 16px;
+}

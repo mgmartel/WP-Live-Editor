@@ -1,0 +1,70 @@
+#live-admin-screen-options {
+    width: 300px;
+    overflow: hidden;
+    z-index: 100;
+    float: left;
+    background: #f5f5f5;
+    padding: 0;
+    margin-left: 0;
+    height: 100%;
+    position: relative;
+
+	-webkit-transition-property: left, right, top, bottom, width, margin;
+	-moz-transition-property:    left, right, top, bottom, width, margin;
+	-ms-transition-property:     left, right, top, bottom, width, margin;
+	-o-transition-property:      left, right, top, bottom, width, margin;
+	transition-property:         left, right, top, bottom, width, margin;
+
+	-webkit-transition-duration: 0.2s;
+	-moz-transition-duration:    0.2s;
+	-ms-transition-duration:     0.2s;
+	-o-transition-duration:      0.2s;
+	transition-duration:         0.2s;
+}
+#live-admin-screen-options.expanded {
+    left: 0;
+}
+#live-admin-screen-options.collapsed {
+    left: -300px;
+}
+
+#screen-options-wrap {
+
+
+}
+
+#screen-options-wrap.hidden {
+    display: block;
+}
+
+.metabox-prefs label {
+    display: block;
+
+    padding: 10px 20px;
+    font-size: 15px;
+    font-family: Georgia, "Times New Roman", "Bitstream Charter", Times, serif;
+    font-weight: normal;
+    text-shadow: 0 1px 0 white;
+    background: #f5f5f5;
+
+    background-image: -webkit-gradient(linear, left bottom, left top, from(#EEE), to(whiteSmoke));
+    background-image: -webkit-linear-gradient(bottom, #EEE, whiteSmoke);
+    background-image: -moz-linear-gradient(bottom, #EEE, whiteSmoke);
+    background-image: -o-linear-gradient(bottom, #EEE, whiteSmoke);
+    background-image: linear-gradient(to top, #EEE, whiteSmoke);
+
+
+}
+
+/* Hide screen options */
+#live-admin-screen-options #hide-screen-options {
+    font-size: 12px;
+    line-height: 34px;
+    border-width: 0 0 1px;
+    border-style: solid;
+
+    color: #AAA;
+    border-bottom-color: #F9F9F9;
+
+    cursor: pointer;
+}

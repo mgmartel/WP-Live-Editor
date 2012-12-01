@@ -1,0 +1,63 @@
+/* Admin menu */
+#adminmenuback {
+    z-index: 199;
+}
+
+#adminmenuwrap {
+    z-index: 249;
+}
+
+#adminmenuback, #adminmenuwrap {
+	-webkit-transition-property: margin;
+	-moz-transition-property:    margin;
+	-ms-transition-property:     margin;
+	-o-transition-property:      margin;
+	transition-property:         margin;
+
+	-webkit-transition-duration: 0.2s;
+	-moz-transition-duration:    0.2s;
+	-ms-transition-duration:     0.2s;
+	-o-transition-duration:      0.2s;
+	transition-duration:         0.2s;
+}
+
+#adminmenuback, #adminmenuwrap, #adminmenuback.collapsed, #adminmenuwrap.collapsed {
+    margin-left: -155px;
+}
+#adminmenuback.expanded, #adminmenuwrap.expanded {
+    margin-left: 0;
+}
+
+/* Hide menu */
+#adminmenuwrap #hide-menu {
+    font-size: 12px;
+    line-height: 34px;
+    border-width: 0 0 1px;
+    border-style: solid;
+
+    color: #AAA;
+    border-bottom-color: #F9F9F9;
+}
+
+#collapse-menu { display: none; }
+
+
+.wp-full-overlay-sidebar {
+    -webkit-transition-property: opacity;
+	-moz-transition-property:    opacity;
+	-ms-transition-property:     opacity;
+	-o-transition-property:      opacity;
+	transition-property:         opacity;
+
+	-webkit-transition-duration: 0.2s;
+	-moz-transition-duration:    0.2s;
+	-ms-transition-duration:     0.2s;
+	-o-transition-duration:      0.2s;
+	transition-duration:         0.2s;
+}
+.wp-full-overlay-sidebar.expanded {
+    opacity: 0.3;
+}
+.wp-full-overlay-sidebar.collapsed {
+    opacity: 1.0;
+}
