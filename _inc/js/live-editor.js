@@ -4,8 +4,7 @@ jQuery(document).ready( function($) {
         iframeScrollTop;
 
     // Get some vars from our template
-    var blog_url = liveEditor.blog_url,
-        post_url = liveEditor.post_url,
+    var post_url = iframeUrl,
         iframe = $('.wp-full-overlay-main iframe'),
         hidden_content = $("input#hidden_content"),
         hidden_title = $("input#hidden_title");
@@ -38,7 +37,7 @@ jQuery(document).ready( function($) {
         iframe.fadeOut();
         no_beforeonunload();
         contents_to_parent();
-        iframeScrollTop = document.getElementById('live-editor-iframe').contentWindow.document.body.scrollTop;
+        iframeScrollTop = document.getElementById('live-admin-iframe').contentWindow.document.body.scrollTop;
 
         if ( transport_options ) var new_url = addQueryParam( 'live-editor-transport', JSON.stringify ( transport_options ), post_url );
         else new_url = post_url;
@@ -74,9 +73,9 @@ jQuery(document).ready( function($) {
          * @todo This iframe scrolltop business is not working properly yet (because Raptor also tries to set the scrolltop?)
          */
         if ( iframeScrollTop )
-            document.getElementById('live-editor-iframe').contentWindow.document.body.scrollTop = iframeScrollTop;
+            document.getElementById('live-admin-iframe').contentWindow.document.body.scrollTop = iframeScrollTop;
         else
-            document.getElementById('live-editor-iframe').contentWindow.document.body.scrollTop = iframe.contents().find('.live-editor-editable-title').first().offset().top - 100;
+            document.getElementById('live-admin-iframe').contentWindow.document.body.scrollTop = iframe.contents().find('.live-editor-editable-title').first().offset().top - 100;
 
         iframe.fadeIn( function() {
             $(window).trigger('iframeLoaded');
@@ -84,7 +83,7 @@ jQuery(document).ready( function($) {
     });
 
     // Load iFrame
-    $(iframe).attr( "src", post_url );
+//    $(iframe).attr( "src", post_url );
 
     // Transport listeners
     if ( typeof( liveEditor.metabox_transports ) != 'undefined' ) {
@@ -106,7 +105,7 @@ jQuery(document).ready( function($) {
 });
 
 // Customizer
-jQuery(document).ready( function($) {
+/*jQuery(document).ready( function($) {
     // Sidebar collpase
     var body = $( document.body ),
         overlay = body.children('.wp-full-overlay');
@@ -127,7 +126,7 @@ jQuery(document).ready( function($) {
         clicked.toggleClass( 'open' );
         event.preventDefault();
     });
-});
+});*/
 
 // Post.js
 var tagBox, commentsBox, editPermalink, makeSlugeditClickable, WPSetThumbnailHTML, WPSetThumbnailID, WPRemoveThumbnail, wptitlehint;

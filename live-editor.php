@@ -77,9 +77,6 @@ if ( !class_exists ( 'WP_LiveEditor' ) ) :
 
             if ( ! is_user_logged_in() ) return;
 
-            require_once ( LIVE_EDITOR_DIR . 'lib/class-templates.php' );
-            $this->templates = new WP_LiveEditor_Templates;
-
             require_once ( LIVE_EDITOR_DIR . 'lib/class-settings.php' );
             $this->settings = new WP_LiveEditor_UserSettings;
 
@@ -185,8 +182,8 @@ if ( !class_exists ( 'WP_LiveEditor' ) ) :
 
         protected function actions_and_filters() {
             // We'll load our own scripts
-            add_action ( "live_editor_print_scripts", array ( &$this, "print_header_scripts" ) );
-            add_action ( "live_editor_print_footer_scripts", array ( &$this, "print_scripts" ) );
+            //add_action ( "live_editor_print_scripts", array ( &$this, "print_header_scripts" ) );
+            //add_action ( "live_editor_print_footer_scripts", array ( &$this, "print_scripts" ) );
 
         }
 
@@ -280,8 +277,9 @@ if ( !class_exists ( 'WP_LiveEditor' ) ) :
          * @since 0.1
          */
         protected function display() {
+            global $post_id;
             $post_id = $post_ID = $this->post_id;
-            require( LIVE_EDITOR_DIR . '/template.php' );
+            require( LIVE_EDITOR_DIR . '/live-editor-template.php' );
         }
 
         /**
@@ -293,6 +291,40 @@ if ( !class_exists ( 'WP_LiveEditor' ) ) :
         protected function enqueue_styles_and_scripts() {
             wp_enqueue_style("live-editor", LIVE_EDITOR_INC_URL . 'css/live-editor.css', array ("customize-controls"), "0.1" );
             wp_enqueue_script("live-editor", LIVE_EDITOR_INC_URL . 'js/live-editor.js', array ("jquery", "utils", "wp-lists", "suggest", "media-upload" ), "0.1" );
+
+            $post_url = get_permalink ( $this->post_id );
+            $iframe_url = add_query_arg( "live_editor_preview", "1", $post_url );
+
+            $args = apply_filters ( 'live_editor_js_vars', array (
+                "blog_url"                 => get_bloginfo('url'),
+                "post_url"                 => $iframe_url,
+                "metabox_transports"       => $this->metabox_transports
+            ) );
+
+            wp_localize_script( "live-editor", "liveEditor", $args);
+
+            $post_l10n = array(
+                'publishOn' => __('Publish on:'),
+                'publishOnFuture' =>  __('Schedule for:'),
+                'publishOnPast' => __('Published on:'),
+                'showcomm' => __('Show more comments'),
+                'endcomm' => __('No more comments found.'),
+                'publish' => __('Publish'),
+                'schedule' => __('Schedule'),
+                'update' => __('Update'),
+                'savePending' => __('Save as Pending'),
+                'saveDraft' => __('Save Draft'),
+                'private' => __('Private'),
+                'public' => __('Public'),
+                'publicSticky' => __('Public, Sticky'),
+                'password' => __('Password Protected'),
+                'privatelyPublished' => __('Privately Published'),
+                'published' => __('Published'),
+                'comma' => _x( ',', 'tag delimiter' ),
+            );
+
+            wp_localize_script( "live-editor", "postL10n", $post_l10n);
+
         }
 
         public function print_header_scripts() {

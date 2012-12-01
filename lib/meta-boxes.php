@@ -1,5 +1,5 @@
 <?php
-global $live_editor;
+global $post, $post_type, $post_ID;
 
 // All meta boxes should be defined and added before the first do_meta_boxes() call (or potentially during the do_meta_boxes action).
 require_once( ABSPATH . 'wp-admin/includes/meta-boxes.php');
@@ -91,10 +91,6 @@ if ( 'page' == $post_type )
 else
 	do_action('submitpost_box');
 
-$live_editor->templates->do_meta_boxes($post_type, 'side', $post);
-
-//echo "<h3>Screen Options</h3>";
-//get_current_screen()->render_screen_options();
-
-$live_editor->templates->do_meta_boxes($post_type, 'normal', $post);
-$live_editor->templates->do_meta_boxes($post_type, 'advanced', $post);
+$this->do_meta_boxes($post_type, 'side', $post);
+$this->do_meta_boxes($post_type, 'normal', $post);
+$this->do_meta_boxes($post_type, 'advanced', $post);
