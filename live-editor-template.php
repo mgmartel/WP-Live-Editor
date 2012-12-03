@@ -6,9 +6,7 @@ if ( !defined ( 'ABSPATH' ) )
 require_once ( LIVE_EDITOR_DIR . 'lib/live-admin/live-admin.php' );
 
 if ( ! class_exists ( 'WP_LiveEditor_Template' ) ) :
-    /**
-     * @todo remember collapsed state
-     */
+
     class WP_LiveEditor_Template extends WP_LiveAdmin
     {
 
@@ -17,22 +15,26 @@ if ( ! class_exists ( 'WP_LiveEditor_Template' ) ) :
 
             $this->menu = true;
             $this->screen_options = true;
+            $this->disable_nav = true;
 
             $post_url = get_permalink ( $post_id );
             $this->iframe_url = add_query_arg( "live_editor_preview", "1", $post_url );
 
-            add_action ( 'live_admin_buttons', array ( &$this, 'publish_button' ) );
-            add_action ( 'live_admin_buttons', array ( &$this, 'save_button' ) );
-            $this->add_button ( $this->cancel_button(), 20 );
+            add_action ( 'live_admin_buttons', array ( &$this, 'publish_button' ), 99 );
+            add_action ( 'live_admin_buttons', array ( &$this, 'save_button' ), 80 );
+            $this->add_button ( $this->cancel_button() );
 
             add_action ( 'live_admin_before_admin-controls', array ( &$this, 'before_admin_controls' ) );
             add_action ( 'live_admin_after_admin-controls', array ( &$this, 'after_admin_controls' ) );
 
             $this->enqueue_styles_and_scripts();
 
+            // Add the relevant meta boxes
+            require ( LIVE_EDITOR_DIR . 'lib/meta-boxes.php' );
+
         }
 
-            public function wp_livedashboard_template() {
+            public function wp_liveeditor_template() {
                 $this->_construct();
             }
 
@@ -84,16 +86,44 @@ if ( ! class_exists ( 'WP_LiveEditor_Template' ) ) :
 
 
         protected function enqueue_styles_and_scripts() {
-            wp_enqueue_style( 'live-dashboard', LIVE_DASHBOARD_INC_URL .'css/live-dashboard.css', array ("customize-controls"), "0.1" );
-            wp_enqueue_script( 'live-dashboard', LIVE_DASHBOARD_INC_URL .'js/live-dashboard.js', array ('jquery') );
+            wp_enqueue_style("live-editor", LIVE_EDITOR_INC_URL . 'css/live-editor.css', array ("customize-controls"), "0.1" );
+            wp_enqueue_script("live-editor", LIVE_EDITOR_INC_URL . 'js/live-editor.js', array ("jquery", "utils", "wp-lists", "suggest", "media-upload" ), "0.1" );
+
+            $args = apply_filters ( 'live_editor_js_vars', array (
+                "metabox_transports"       => $this->metabox_transports
+            ) );
+
+            wp_localize_script( "live-editor", "liveEditor", $args);
+
+            $post_l10n = array(
+                'publishOn' => __('Publish on:'),
+                'publishOnFuture' =>  __('Schedule for:'),
+                'publishOnPast' => __('Published on:'),
+                'showcomm' => __('Show more comments'),
+                'endcomm' => __('No more comments found.'),
+                'publish' => __('Publish'),
+                'schedule' => __('Schedule'),
+                'update' => __('Update'),
+                'savePending' => __('Save as Pending'),
+                'saveDraft' => __('Save Draft'),
+                'private' => __('Private'),
+                'public' => __('Public'),
+                'publicSticky' => __('Public, Sticky'),
+                'password' => __('Password Protected'),
+                'privatelyPublished' => __('Privately Published'),
+                'published' => __('Published'),
+                'comma' => _x( ',', 'tag delimiter' ),
+            );
+
+            wp_localize_script( "live-editor", "postL10n", $post_l10n);
         }
 
 
         public function do_start() {
             // Go ahead and load all admin globals
-//            global $title, $hook_suffix, $current_screen, $wp_locale, $pagenow, $wp_version,
-//                $current_site, $update_title, $total_update_count, $parent_file, $live_editor, $post_id, $post;
             global $title, $parent_file, $post_id, $post;
+
+            wp_enqueue_script('post');
 
             /**
              * START EDIT POST HEADER
@@ -322,7 +352,24 @@ if ( ! class_exists ( 'WP_LiveEditor_Template' ) ) :
         }
 
         public function do_controls() {
-            require ( LIVE_EDITOR_DIR . 'lib/meta-boxes.php' );
+            global $post_type, $post;
+
+            do_action('add_meta_boxes', $post_type, $post);
+            do_action('add_meta_boxes_' . $post_type, $post);
+
+            do_action('do_meta_boxes', $post_type, 'normal', $post);
+            do_action('do_meta_boxes', $post_type, 'advanced', $post);
+            do_action('do_meta_boxes', $post_type, 'side', $post);
+
+            if ( 'page' == $post_type )
+                do_action('submitpage_box');
+            else
+                do_action('submitpost_box');
+
+            $this->do_meta_boxes($post_type, 'side', $post);
+            $this->do_meta_boxes($post_type, 'normal', $post);
+            $this->do_meta_boxes($post_type, 'advanced', $post);
+
         }
 
         /**
@@ -377,7 +424,7 @@ if ( ! class_exists ( 'WP_LiveEditor_Template' ) ) :
                             $open_class = ( $box['id'] == 'submitdiv' ) ? ' open' : '';
                             //echo "<li class='control-section customize-section'>";
                             //echo '<li id="' . $box['id'] . '" class="control-section customize-section' . $open_class . postbox_classes($box['id'], $page) . $hidden_class . '" ' . '>' . "\n";
-                            echo '<li id="' . $box['id'] . '" class="control-section customize-section' . $open_class . $hidden_class . '" ' . '>' . "\n";
+                            echo '<li id="' . $box['id'] . '" class="control-section customize-section' . $open_class . $hidden_class . ' ' . $this->postbox_class . postbox_classes($box['id'], $page) . '" ' . '>' . "\n";
                             //if ( 'dashboard_browser_nag' != $box['id'] )
                             //	echo '<div class="handlediv" title="' . esc_attr__('Click to toggle') . '"><br /></div>';
                             echo "<h3 class='customize-section-title'><span>{$box['title']}</span></h3>\n";
