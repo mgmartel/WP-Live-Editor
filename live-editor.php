@@ -82,8 +82,6 @@ if ( !class_exists ( 'WP_LiveEditor' ) ) :
 
             require_once ( LIVE_EDITOR_DIR . 'lib/class.wp-help-pointers.php' );
 
-            $this->actions_and_filters();
-
             // Make sure we redirect to the right editing interface
             if ( isset ( $_POST['action'] ) && $_POST['action'] == "editpost" )
                 $this->live_editor_redirects();
@@ -180,13 +178,6 @@ if ( !class_exists ( 'WP_LiveEditor' ) ) :
 
         }
 
-        protected function actions_and_filters() {
-            // We'll load our own scripts
-            //add_action ( "live_editor_print_scripts", array ( &$this, "print_header_scripts" ) );
-            //add_action ( "live_editor_print_footer_scripts", array ( &$this, "print_scripts" ) );
-
-        }
-
         protected function live_editor_redirects() {
             if ( ! isset ( $_POST['live'] ) || ! $_POST['live'] == 'true' ) {
                 add_action ( 'redirect_post_location', array ( &$this, 'add_no_live_editor_query_arg' ) );
@@ -254,7 +245,7 @@ if ( !class_exists ( 'WP_LiveEditor' ) ) :
          * @return type
          */
         protected function set_vars() {
-            global $post, $post_id, $post_ID;
+            global $post, $post_id, $post_ID, $post_type, $post_type_object;
 
             if ( isset( $_GET['post'] ) ) {
                 $this->post_id = (int) $_GET['post'];
@@ -267,6 +258,10 @@ if ( !class_exists ( 'WP_LiveEditor' ) ) :
 
             $post_ID = $post_id = $this->post_id;
             $post = get_post ( $this->post_id );
+
+            $post_type = $post->post_type;
+            $post_type_object = get_post_type_object( $post_type );
+
             return $this->post_id;
         }
 
