@@ -219,7 +219,6 @@ if ( !class_exists ( 'WP_LiveEditor' ) ) :
 
         public function live() {
 
-            $this->enqueue_styles_and_scripts();
             $this->set_vars();
 
             require_once ( LIVE_EDITOR_DIR . 'lib/meta-box-transports.php' );
@@ -255,7 +254,7 @@ if ( !class_exists ( 'WP_LiveEditor' ) ) :
          * @return type
          */
         protected function set_vars() {
-            global $post, $post_ID;
+            global $post, $post_id, $post_ID;
 
             if ( isset( $_GET['post'] ) ) {
                 $this->post_id = (int) $_GET['post'];
@@ -266,7 +265,7 @@ if ( !class_exists ( 'WP_LiveEditor' ) ) :
                 $this->post_id = 0;
             }
 
-            $post_ID = $this->post_id;
+            $post_ID = $post_id = $this->post_id;
             $post = get_post ( $this->post_id );
             return $this->post_id;
         }
@@ -277,54 +276,7 @@ if ( !class_exists ( 'WP_LiveEditor' ) ) :
          * @since 0.1
          */
         protected function display() {
-            global $post_id;
-            $post_id = $post_ID = $this->post_id;
             require( LIVE_EDITOR_DIR . '/live-editor-template.php' );
-        }
-
-        /**
-         * Enqueue scripts and styles
-         *
-         * @since 0.1
-         * @todo Choose Featured Image is no working @ WP 3.5beta
-         */
-        protected function enqueue_styles_and_scripts() {
-            wp_enqueue_style("live-editor", LIVE_EDITOR_INC_URL . 'css/live-editor.css', array ("customize-controls"), "0.1" );
-            wp_enqueue_script("live-editor", LIVE_EDITOR_INC_URL . 'js/live-editor.js', array ("jquery", "utils", "wp-lists", "suggest", "media-upload" ), "0.1" );
-
-            $post_url = get_permalink ( $this->post_id );
-            $iframe_url = add_query_arg( "live_editor_preview", "1", $post_url );
-
-            $args = apply_filters ( 'live_editor_js_vars', array (
-                "blog_url"                 => get_bloginfo('url'),
-                "post_url"                 => $iframe_url,
-                "metabox_transports"       => $this->metabox_transports
-            ) );
-
-            wp_localize_script( "live-editor", "liveEditor", $args);
-
-            $post_l10n = array(
-                'publishOn' => __('Publish on:'),
-                'publishOnFuture' =>  __('Schedule for:'),
-                'publishOnPast' => __('Published on:'),
-                'showcomm' => __('Show more comments'),
-                'endcomm' => __('No more comments found.'),
-                'publish' => __('Publish'),
-                'schedule' => __('Schedule'),
-                'update' => __('Update'),
-                'savePending' => __('Save as Pending'),
-                'saveDraft' => __('Save Draft'),
-                'private' => __('Private'),
-                'public' => __('Public'),
-                'publicSticky' => __('Public, Sticky'),
-                'password' => __('Password Protected'),
-                'privatelyPublished' => __('Privately Published'),
-                'published' => __('Published'),
-                'comma' => _x( ',', 'tag delimiter' ),
-            );
-
-            wp_localize_script( "live-editor", "postL10n", $post_l10n);
-
         }
 
         public function print_header_scripts() {

@@ -16,13 +16,14 @@ if ( ! class_exists ( 'WP_LiveEditor_Template' ) ) :
             $this->menu = true;
             $this->screen_options = true;
             $this->disable_nav = true;
+            $this->handle = 'post.php';
 
             $post_url = get_permalink ( $post_id );
             $this->iframe_url = add_query_arg( "live_editor_preview", "1", $post_url );
 
             add_action ( 'live_admin_buttons', array ( &$this, 'publish_button' ), 99 );
             add_action ( 'live_admin_buttons', array ( &$this, 'save_button' ), 80 );
-            $this->add_button ( $this->cancel_button() );
+            $this->add_button ( $this->cancel_button(), 10 );
 
             add_action ( 'live_admin_before_admin-controls', array ( &$this, 'before_admin_controls' ) );
             add_action ( 'live_admin_after_admin-controls', array ( &$this, 'after_admin_controls' ) );
@@ -160,14 +161,11 @@ if ( ! class_exists ( 'WP_LiveEditor_Template' ) ) :
 
             // We're always editing in this screen
             $action = 'edit';
-            $editing = true;
 
             if ( empty( $post_id ) ) {
                 wp_redirect( admin_url('post.php') );
                 exit();
             }
-
-            $p = $post_id;
 
             if ( empty($post->ID) )
                 wp_die( __('You attempted to edit an item that doesn&#8217;t exist. Perhaps it was deleted?') );
@@ -199,13 +197,6 @@ if ( ! class_exists ( 'WP_LiveEditor_Template' ) ) :
                 $post_new_file = "post-new.php?post_type=$post_type";
             }
 
-            if ( $last = wp_check_post_lock( $post->ID ) ) {
-                add_action('admin_notices', '_admin_notice_post_locked' );
-            } else {
-                $active_post_lock = wp_set_post_lock( $post->ID );
-                wp_enqueue_script('autosave');
-            }
-
             $title = $post_type_object->labels->edit_item;
             $post = get_post($post_id, OBJECT, 'edit');
 
@@ -227,7 +218,6 @@ if ( ! class_exists ( 'WP_LiveEditor_Template' ) ) :
             //$post_ID = isset($post_ID) ? (int) $post_ID : 0;
             //$user_ID = isset($user_ID) ? (int) $user_ID : 0;
             $post_ID = $post_id;
-            $user_ID = $current_user;
 
             $messages = array();
             $messages['post'] = array(
@@ -273,29 +263,12 @@ if ( ! class_exists ( 'WP_LiveEditor_Template' ) ) :
             }
 
             $notice = false;
-            $form_extra = '';
             if ( 'auto-draft' == get_post_status( $post ) ) {
                 if ( 'edit' == $action )
                     $post->post_title = '';
                 $autosave = false;
-                $form_extra .= "<input type='hidden' id='auto_draft' name='auto_draft' value='1' />";
             } else {
                 $autosave = wp_get_post_autosave( $post_ID );
-            }
-
-            $form_action = 'editpost';
-            $nonce_action = 'update-post_' . $post_ID;
-            $form_extra .= "<input type='hidden' id='post_ID' name='post_ID' value='" . esc_attr($post_ID) . "' />";
-
-            // Detect if there exists an autosave newer than the post and if that autosave is different than the post
-            if ( $autosave && mysql2date( 'U', $autosave->post_modified_gmt, false ) > mysql2date( 'U', $post->post_modified_gmt, false ) ) {
-                foreach ( _wp_post_revision_fields() as $autosave_field => $_autosave_field ) {
-                    if ( normalize_whitespace( $autosave->$autosave_field ) != normalize_whitespace( $post->$autosave_field ) ) {
-                        $notice = sprintf( __( 'There is an autosave of this post that is more recent than the version below. <a href="%s">View the autosave</a>' ), get_edit_post_link( $autosave->ID ) );
-                        break;
-                    }
-                }
-                unset($autosave_field, $_autosave_field);
             }
 
         }
@@ -314,6 +287,28 @@ if ( ! class_exists ( 'WP_LiveEditor_Template' ) ) :
         }
 
         public function before_admin_controls() {
+            global $user_ID, $post_type, $post, $post_ID;
+
+            $form_extra = '';
+            if ( 'auto-draft' == get_post_status( $post ) ) {
+                $post->post_title = '';
+                $autosave = false;
+                $form_extra .= "<input type='hidden' id='auto_draft' name='auto_draft' value='1' />";
+            } else {
+                $autosave = wp_get_post_autosave( $post_ID );
+            }
+
+            $form_action = 'editpost';
+            $nonce_action = 'update-post_' . $post_ID;
+            $form_extra .= "<input type='hidden' id='post_ID' name='post_ID' value='" . esc_attr($post_ID) . "' />";
+
+            if ( $last = wp_check_post_lock( $post->ID ) ) {
+                add_action('admin_notices', '_admin_notice_post_locked' );
+            } else {
+                $active_post_lock = wp_set_post_lock( $post->ID );
+                wp_enqueue_script('autosave');
+            }
+
             ?>
             <form name="post" action="post.php?live=1" method="post" id="post"<?php do_action('post_edit_form_tag'); ?>  class="wrap wp-full-overlay-sidebar">
             <?php wp_nonce_field($nonce_action); ?>
