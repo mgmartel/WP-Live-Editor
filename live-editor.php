@@ -60,7 +60,7 @@ if ( !class_exists ( 'WP_LiveEditor' ) ) :
             global $live_editor;
 
             if ( !$live_editor ) {
-                load_plugin_textdomain ( 'live-editor', false, LIVE_EDITOR_DIR . '/languages/' );
+                load_plugin_textdomain ( 'live-editor', false, basename ( LIVE_EDITOR_DIR ) . '/languages/' );
                 $live_editor = new WP_LiveEditor;
             }
 
