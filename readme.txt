@@ -63,6 +63,8 @@ When the Visual Editor is disabled, there are no tabs above the editor. Instead,
 = 0.1 =
 * Initial release
 
+== Other Notes ==
+
 = For Developers =
 
 If your plugin or theme adds metaboxes to the post screen, or has custom fields that influence the way a post is displayed (eg. by adding a map), you can set Live Editor to automatically refresh the preview pane each time that option is updated.
