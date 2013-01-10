@@ -81,7 +81,7 @@ if ( !class_exists ( 'WP_LiveEditor' ) ) :
             $this->settings = new WP_LiveAdmin_Settings(
                 'editor',
                 __('Live Editor', 'live-editor'),
-                __('Use the Live Editor as the default for editting posts','live-editor'),
+                __('Use the Live Editor as the default for writing','live-editor'),
                 'false',
                 array ( 'post.php', 'post-new.php' )
             );
