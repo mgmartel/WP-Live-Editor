@@ -1,7 +1,7 @@
 <?php
 /*
   Plugin Name: Live Editor
-  Plugin URI: http://trenvo.com
+  Plugin URI: http://trenvo.com/live-editor
   Description: Front-end editing with back-end flexibility
   Version: 0.1
   Author: Mike Martel
