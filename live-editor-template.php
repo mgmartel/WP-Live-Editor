@@ -3,8 +3,6 @@
 if ( !defined ( 'ABSPATH' ) )
     exit;
 
-require_once ( LIVE_EDITOR_DIR . 'lib/live-admin/live-admin.php' );
-
 if ( ! class_exists ( 'WP_LiveEditor_Template' ) ) :
 
     class WP_LiveEditor_Template extends WP_LiveAdmin
@@ -276,7 +274,7 @@ if ( ! class_exists ( 'WP_LiveEditor_Template' ) ) :
         public function do_footer_actions() {
             global $live_editor;
             ?>
-            <a class="button" href="<?php echo $live_editor->add_no_live_editor_query_arg(); ?>" style="
+            <a class="button" href="<?php echo $live_editor->settings->switch_url(); ?>" style="
                position: absolute;
                 bottom: 9px;
                 right: 16px;

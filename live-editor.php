@@ -73,12 +73,18 @@ if ( !class_exists ( 'WP_LiveEditor' ) ) :
          * @since 0.1
          */
         public function __construct() {
-            global $pagenow;
-
             if ( ! is_user_logged_in() ) return;
 
-            require_once ( LIVE_EDITOR_DIR . 'lib/class-settings.php' );
-            $this->settings = new WP_LiveEditor_UserSettings;
+            //require_once ( LIVE_EDITOR_DIR . 'lib/class-settings.php' );
+            //$this->settings = new WP_LiveEditor_UserSettings;
+            require_once ( LIVE_EDITOR_DIR . 'lib/live-admin/live-admin.php' );
+            $this->settings = new WP_LiveAdmin_Settings(
+                'editor',
+                __('Live Editor', 'live-editor'),
+                __('Use the Live Editor as the default for editting posts','live-editor'),
+                'false',
+                array ( 'post.php', 'post-new.php' )
+            );
 
             require_once ( LIVE_EDITOR_DIR . 'lib/class.wp-help-pointers.php' );
 
@@ -99,29 +105,11 @@ if ( !class_exists ( 'WP_LiveEditor' ) ) :
                 $this->__construct ();
             }
 
-        public function is_active() {
-            if ( ! empty ( $this->active ) )
-                return $this->active;
-
-            $is_default = $this->settings->is_default();
-            $is_deactivated = ( isset($_REQUEST['live_off']) && $_REQUEST['live_off'] == true  );
-            $is_activated = ( isset($_REQUEST['live']) && $_REQUEST['live'] == true  );
-
-            if ( $is_default )
-                $this->active = ( ! $is_deactivated );
-            elseif ( ! $is_default )
-                $this->active = ( $is_activated );
-
-            return apply_filters ( 'live_editor_is_active', &$this->active );
-        }
-
         public function setup() {
             global $pagenow;
 
-            $active = $this->is_active();
-
-            if ( ! $active ) {
-                if ( $pagenow == 'post.php' ) {
+            if ( ! $this->settings->is_active() ) {
+                if ( $pagenow == 'post.php' ) { // Don't show switch tabs on new posts
                     if ( get_user_meta ( get_current_user_id(), 'rich_editing', true ) == "false" ) {
                         add_action('submitpage_box', array ( &$this, 'switch_interface_button' ), 1 );
                         add_action('submitpost_box', array ( &$this, 'switch_interface_button' ), 1 );
@@ -131,11 +119,10 @@ if ( !class_exists ( 'WP_LiveEditor' ) ) :
                     if ( ! $this->settings->is_default() )
                         add_action ( 'admin_enqueue_scripts', array ( &$this, 'set_pointers' ) );
                 }
-            } else {
-                if ( $pagenow == 'post.php' )
+            } elseif ( $pagenow == 'post.php' ) {
                     add_action ('admin_action_edit', array ( &$this, 'live' ) );
-                elseif ( $pagenow == 'post-new.php' )
-                    $this->new_post();
+            } elseif ( $pagenow == 'post-new.php' ) {
+                $this->new_post();
             }
         }
 
@@ -163,7 +150,7 @@ if ( !class_exists ( 'WP_LiveEditor' ) ) :
          */
         public function switch_interface_button() {
             ?>
-            <a class="button" href="<?php echo $this->add_live_editor_query_arg(); ?>" style='margin-bottom: 12px'>
+            <a class="button" href="<?php echo $this->settings->add_live_query_arg(); ?>" style='margin-bottom: 12px'>
                 <?php _e( 'Use Live Editor', 'bfee' ); ?>
             </a>
             <?php
@@ -172,7 +159,7 @@ if ( !class_exists ( 'WP_LiveEditor' ) ) :
         public function add_live_mce_tab() {
             echo "
                 <script>
-                    jQuery('.wp-switch-editor#content-tmce').after(\"<a id='content-live' class='hide-if-no-js wp-switch-editor switch-live' href='" . $this->add_live_editor_query_arg() . "' style='text-decoration:none'>Live</a>\");
+                    jQuery('.wp-switch-editor#content-tmce').after(\"<a id='content-live' class='hide-if-no-js wp-switch-editor switch-live' href='" . $this->settings->add_live_query_arg() . "' style='text-decoration:none'>Live</a>\");
                 </script>
                 ";
 
@@ -233,7 +220,7 @@ if ( !class_exists ( 'WP_LiveEditor' ) ) :
 
             // If Live Editor is not the default editor, make sure the next screen shows Live Editor
             if ( ! $this->settings->is_default() )
-                $post_link = $this->add_live_editor_query_arg( $post_link );
+                $post_link = $this->settings->add_live_query_arg( $post_link );
 
             $post_link = apply_filters ( 'live_editor_new_post_redirect', $post_link, $post->ID );
 
