@@ -60,7 +60,7 @@ if ( !class_exists ( 'WP_LiveEditor' ) ) :
             global $live_editor;
 
             if ( !$live_editor ) {
-                load_plugin_textdomain ( 'live-editor', false, LIVE_EDITOR_DIR . '/languages/' );
+                load_plugin_textdomain ( 'live-editor', false, basename ( LIVE_EDITOR_DIR ) . '/languages/' );
                 $live_editor = new WP_LiveEditor;
             }
 
@@ -73,19 +73,20 @@ if ( !class_exists ( 'WP_LiveEditor' ) ) :
          * @since 0.1
          */
         public function __construct() {
-            global $pagenow;
-
             if ( ! is_user_logged_in() ) return;
 
-            require_once ( LIVE_EDITOR_DIR . 'lib/class-templates.php' );
-            $this->templates = new WP_LiveEditor_Templates;
-
-            require_once ( LIVE_EDITOR_DIR . 'lib/class-settings.php' );
-            $this->settings = new WP_LiveEditor_UserSettings;
+            //require_once ( LIVE_EDITOR_DIR . 'lib/class-settings.php' );
+            //$this->settings = new WP_LiveEditor_UserSettings;
+            require_once ( LIVE_EDITOR_DIR . 'lib/live-admin/live-admin.php' );
+            $this->settings = new WP_LiveAdmin_Settings(
+                'editor',
+                __('Live Editor', 'live-editor'),
+                __('Use the Live Editor as the default for writing','live-editor'),
+                'false',
+                array ( 'post.php', 'post-new.php' )
+            );
 
             require_once ( LIVE_EDITOR_DIR . 'lib/class.wp-help-pointers.php' );
-
-            $this->actions_and_filters();
 
             // Make sure we redirect to the right editing interface
             if ( isset ( $_POST['action'] ) && $_POST['action'] == "editpost" )
@@ -104,29 +105,11 @@ if ( !class_exists ( 'WP_LiveEditor' ) ) :
                 $this->__construct ();
             }
 
-        public function is_active() {
-            if ( ! empty ( $this->active ) )
-                return $this->active;
-
-            $is_default = $this->settings->is_default();
-            $is_deactivated = ( isset($_REQUEST['live_off']) && $_REQUEST['live_off'] == true  );
-            $is_activated = ( isset($_REQUEST['live']) && $_REQUEST['live'] == true  );
-
-            if ( $is_default )
-                $this->active = ( ! $is_deactivated );
-            elseif ( ! $is_default )
-                $this->active = ( $is_activated );
-
-            return apply_filters ( 'live_editor_is_active', &$this->active );
-        }
-
         public function setup() {
             global $pagenow;
 
-            $active = $this->is_active();
-
-            if ( ! $active ) {
-                if ( $pagenow == 'post.php' ) {
+            if ( ! $this->settings->is_active() ) {
+                if ( $pagenow == 'post.php' ) { // Don't show switch tabs on new posts
                     if ( get_user_meta ( get_current_user_id(), 'rich_editing', true ) == "false" ) {
                         add_action('submitpage_box', array ( &$this, 'switch_interface_button' ), 1 );
                         add_action('submitpost_box', array ( &$this, 'switch_interface_button' ), 1 );
@@ -136,11 +119,10 @@ if ( !class_exists ( 'WP_LiveEditor' ) ) :
                     if ( ! $this->settings->is_default() )
                         add_action ( 'admin_enqueue_scripts', array ( &$this, 'set_pointers' ) );
                 }
-            } else {
-                if ( $pagenow == 'post.php' )
+            } elseif ( $pagenow == 'post.php' ) {
                     add_action ('admin_action_edit', array ( &$this, 'live' ) );
-                elseif ( $pagenow == 'post-new.php' )
-                    $this->new_post();
+            } elseif ( $pagenow == 'post-new.php' ) {
+                $this->new_post();
             }
         }
 
@@ -168,7 +150,7 @@ if ( !class_exists ( 'WP_LiveEditor' ) ) :
          */
         public function switch_interface_button() {
             ?>
-            <a class="button" href="<?php echo $this->add_live_editor_query_arg(); ?>" style='margin-bottom: 12px'>
+            <a class="button" href="<?php echo $this->settings->add_live_query_arg(); ?>" style='margin-bottom: 12px'>
                 <?php _e( 'Use Live Editor', 'bfee' ); ?>
             </a>
             <?php
@@ -177,16 +159,9 @@ if ( !class_exists ( 'WP_LiveEditor' ) ) :
         public function add_live_mce_tab() {
             echo "
                 <script>
-                    jQuery('.wp-switch-editor#content-tmce').after(\"<a id='content-live' class='hide-if-no-js wp-switch-editor switch-live' href='" . $this->add_live_editor_query_arg() . "' style='text-decoration:none'>Live</a>\");
+                    jQuery('.wp-switch-editor#content-tmce').after(\"<a id='content-live' class='hide-if-no-js wp-switch-editor switch-live' href='" . $this->settings->add_live_query_arg() . "' style='text-decoration:none'>Live</a>\");
                 </script>
                 ";
-
-        }
-
-        protected function actions_and_filters() {
-            // We'll load our own scripts
-            add_action ( "live_editor_print_scripts", array ( &$this, "print_header_scripts" ) );
-            add_action ( "live_editor_print_footer_scripts", array ( &$this, "print_scripts" ) );
 
         }
 
@@ -222,7 +197,6 @@ if ( !class_exists ( 'WP_LiveEditor' ) ) :
 
         public function live() {
 
-            $this->enqueue_styles_and_scripts();
             $this->set_vars();
 
             require_once ( LIVE_EDITOR_DIR . 'lib/meta-box-transports.php' );
@@ -246,7 +220,7 @@ if ( !class_exists ( 'WP_LiveEditor' ) ) :
 
             // If Live Editor is not the default editor, make sure the next screen shows Live Editor
             if ( ! $this->settings->is_default() )
-                $post_link = $this->add_live_editor_query_arg( $post_link );
+                $post_link = $this->settings->add_live_query_arg( $post_link );
 
             $post_link = apply_filters ( 'live_editor_new_post_redirect', $post_link, $post->ID );
 
@@ -258,7 +232,7 @@ if ( !class_exists ( 'WP_LiveEditor' ) ) :
          * @return type
          */
         protected function set_vars() {
-            global $post, $post_ID;
+            global $post, $post_id, $post_ID, $post_type, $post_type_object;
 
             if ( isset( $_GET['post'] ) ) {
                 $this->post_id = (int) $_GET['post'];
@@ -269,8 +243,12 @@ if ( !class_exists ( 'WP_LiveEditor' ) ) :
                 $this->post_id = 0;
             }
 
-            $post_ID = $this->post_id;
+            $post_ID = $post_id = $this->post_id;
             $post = get_post ( $this->post_id );
+
+            $post_type = $post->post_type;
+            $post_type_object = get_post_type_object( $post_type );
+
             return $this->post_id;
         }
 
@@ -280,19 +258,7 @@ if ( !class_exists ( 'WP_LiveEditor' ) ) :
          * @since 0.1
          */
         protected function display() {
-            $post_id = $post_ID = $this->post_id;
-            require( LIVE_EDITOR_DIR . '/template.php' );
-        }
-
-        /**
-         * Enqueue scripts and styles
-         *
-         * @since 0.1
-         * @todo Choose Featured Image is no working @ WP 3.5beta
-         */
-        protected function enqueue_styles_and_scripts() {
-            wp_enqueue_style("live-editor", LIVE_EDITOR_INC_URL . 'css/live-editor.css', array ("customize-controls"), "0.1" );
-            wp_enqueue_script("live-editor", LIVE_EDITOR_INC_URL . 'js/live-editor.js', array ("jquery", "utils", "wp-lists", "suggest", "media-upload" ), "0.1" );
+            require( LIVE_EDITOR_DIR . '/live-editor-template.php' );
         }
 
         public function print_header_scripts() {

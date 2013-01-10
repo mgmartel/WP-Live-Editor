@@ -91,8 +91,6 @@ if ( !class_exists ( 'WP_LiveEditor_iFrame' ) ) :
         }
 
         public function setup_editor() {
-            wp_enqueue_script('live-editor-in-place-init', LIVE_EDITOR_INC_URL . 'js/in-place.js', array ( 'jquery' ), '1.0.0', true);
-
             if ( defined ( 'RAPTOR_ROOT' ) ) {
                 add_filter('_pre_option_raptor-settings', array ( &$this, 'bundled_raptor_settings' ) );
                 add_action ( 'wp_print_scripts', array ( &$this, 'raptor_in_place_scripts' ), 11 );
