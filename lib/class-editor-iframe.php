@@ -90,12 +90,7 @@ if ( !class_exists ( 'WP_LiveEditor_iFrame' ) ) :
             return false;
         }
 
-        /**
-         * @todo Add FEE?
-         */
         public function setup_editor() {
-            wp_enqueue_script('live-editor-in-place-init', LIVE_EDITOR_INC_URL . 'js/in-place.js', array ( 'jquery' ), '1.0.0', true);
-
             if ( defined ( 'RAPTOR_ROOT' ) ) {
                 add_filter('_pre_option_raptor-settings', array ( &$this, 'bundled_raptor_settings' ) );
                 add_action ( 'wp_print_scripts', array ( &$this, 'raptor_in_place_scripts' ), 11 );
@@ -104,9 +99,6 @@ if ( !class_exists ( 'WP_LiveEditor_iFrame' ) ) :
             }
         }
 
-        /**
-         * @todo get allowOversizeImages from Raptor
-         */
         public function raptor_in_place_scripts() {
             wp_dequeue_script( 'raptor-in-place-init' );
             wp_enqueue_script('live-editor-raptor-in-place-init', LIVE_EDITOR_INC_URL . 'js/raptor.js', array ( 'raptor', 'jquery' ), '1.0.0', true);
@@ -115,8 +107,7 @@ if ( !class_exists ( 'WP_LiveEditor_iFrame' ) ) :
                         'url' => admin_url('admin-ajax.php'),
                         'nonce' => wp_create_nonce(RaptorSave::SAVE_POSTS_NONCE),
                         'action' => RaptorSave::SAVE_POSTS,
-                        'allowOversizeImages' => true
-                        //'allowOversizeImages' => $raptor->options->resizeImagesAutomatically()
+                        'allowOversizeImages' => 1,
                     ));
         }
 
@@ -131,11 +122,11 @@ if ( !class_exists ( 'WP_LiveEditor_iFrame' ) ) :
 
         public function live_editor_preview_iframe_styles() {
             echo "<style>
-                .raptor-editable-post,
                 /*.live-editor-editable-title */
+                .raptor-editable-post
                     {outline:1px dashed rgba(0, 0, 0, 0.5);}
-                .raptor-editable-post:focus,
                 /*.live-editor-editable-title:focus */
+                .raptor-editable-post:focus
                     {outline:none;}
                 .ui-editor-dock-docked .ui-editor-toolbar-wrapper { min-height: 44px; background-color: #f5f5f5 !important;
             </style>";
@@ -145,7 +136,6 @@ if ( !class_exists ( 'WP_LiveEditor_iFrame' ) ) :
          *
          * @param array $options
          * @return string
-         * @todo properly test this
          */
         public function bundled_raptor_settings( $options) {
             $options = array(

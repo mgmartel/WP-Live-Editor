@@ -14,21 +14,21 @@
     margin: 10px;
 }
 
-#live-editor-header-actions .button-primary {
+#live-admin-header-actions .button-primary {
     float: right;
     margin-top: 10px;
 }
 
-.saving #live-editor-header-actions .spinner {
+.saving #live-admin-header-actions .spinner {
 	display: block;
 }
 
-#live-editor-header-actions .spinner {
+#live-admin-header-actions .spinner {
     margin-top: 16px;
     margin-right: 4px;
 }
 
-#live-editor-theme-controls > ul {
+#live-admin-theme-controls > ul {
     margin: 0;
 }
 
