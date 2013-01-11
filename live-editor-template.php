@@ -260,14 +260,8 @@ if ( ! class_exists ( 'WP_LiveEditor_Template' ) ) :
                     $message = $messages['post'][$_GET['message']];
             }
 
-            $notice = false;
-            if ( 'auto-draft' == get_post_status( $post ) ) {
-                if ( 'edit' == $action )
-                    $post->post_title = '';
-                $autosave = false;
-            } else {
-                $autosave = wp_get_post_autosave( $post_ID );
-            }
+            if ( $message )
+                $this->admin_notice = "<div id='message' class='updated'><p>$message</p></div>";
 
         }
 
