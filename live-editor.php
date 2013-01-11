@@ -86,8 +86,6 @@ if ( !class_exists ( 'WP_LiveEditor' ) ) :
                 array ( 'post.php', 'post-new.php' )
             );
 
-            require_once ( LIVE_EDITOR_DIR . 'lib/class.wp-help-pointers.php' );
-
             // Make sure we redirect to the right editing interface
             if ( isset ( $_POST['action'] ) && $_POST['action'] == "editpost" )
                 $this->live_editor_redirects();
