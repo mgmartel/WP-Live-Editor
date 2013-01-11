@@ -86,11 +86,13 @@ if ( ! class_exists ( 'WP_LiveEditor_Template' ) ) :
 
 
         protected function enqueue_styles_and_scripts() {
+            global $live_editor;
+
             wp_enqueue_style("live-editor", LIVE_EDITOR_INC_URL . 'css/live-editor.css', array ("customize-controls"), "0.1" );
             wp_enqueue_script("live-editor", LIVE_EDITOR_INC_URL . 'js/live-editor.js', array ("jquery", "utils", "wp-lists", "suggest", "media-upload" ), "0.1" );
 
             $args = apply_filters ( 'live_editor_js_vars', array (
-                "metabox_transports"       => $this->metabox_transports
+                "metabox_transports"       => $live_editor->metabox_transports
             ) );
 
             wp_localize_script( "live-editor", "liveEditor", $args);
