@@ -44,7 +44,8 @@ if ( ! class_exists ( 'WP_LiveEditor_Template' ) ) :
             </a>';
         }
 
-        public function publish_button( $post ) {
+        public function publish_button() {
+            global $post;
 
             $post_type = $post->post_type;
             $post_type_object = get_post_type_object($post_type);
@@ -72,7 +73,9 @@ if ( ! class_exists ( 'WP_LiveEditor_Template' ) ) :
 
         }
 
-        public function save_button ( $post ) {
+        public function save_button () {
+            global $post;
+
             if ( 'publish' != $post->post_status && 'future' != $post->post_status && 'pending' != $post->post_status ) { ?>
             <input <?php if ( 'private' == $post->post_status ) { ?>style="display:none"<?php } ?> type="submit" name="save" id="save-post-live-editor" value="<?php esc_attr_e('Save Draft'); ?>" class="button" />
             <?php } elseif ( 'pending' == $post->post_status && $can_publish ) { ?>
