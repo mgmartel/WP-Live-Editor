@@ -26,8 +26,6 @@ if ( ! class_exists ( 'WP_LiveEditor_Template' ) ) :
             add_action ( 'live_admin_before_admin-controls', array ( &$this, 'before_admin_controls' ) );
             add_action ( 'live_admin_after_admin-controls', array ( &$this, 'after_admin_controls' ) );
 
-            $this->enqueue_styles_and_scripts();
-
             // Add the relevant meta boxes
             require ( LIVE_EDITOR_DIR . 'lib/meta-boxes.php' );
 
@@ -46,7 +44,8 @@ if ( ! class_exists ( 'WP_LiveEditor_Template' ) ) :
             </a>';
         }
 
-        public function publish_button( $post ) {
+        public function publish_button() {
+            global $post;
 
             $post_type = $post->post_type;
             $post_type_object = get_post_type_object($post_type);
@@ -74,7 +73,9 @@ if ( ! class_exists ( 'WP_LiveEditor_Template' ) ) :
 
         }
 
-        public function save_button ( $post ) {
+        public function save_button () {
+            global $post;
+
             if ( 'publish' != $post->post_status && 'future' != $post->post_status && 'pending' != $post->post_status ) { ?>
             <input <?php if ( 'private' == $post->post_status ) { ?>style="display:none"<?php } ?> type="submit" name="save" id="save-post-live-editor" value="<?php esc_attr_e('Save Draft'); ?>" class="button" />
             <?php } elseif ( 'pending' == $post->post_status && $can_publish ) { ?>
@@ -85,11 +86,13 @@ if ( ! class_exists ( 'WP_LiveEditor_Template' ) ) :
 
 
         protected function enqueue_styles_and_scripts() {
+            global $live_editor;
+
             wp_enqueue_style("live-editor", LIVE_EDITOR_INC_URL . 'css/live-editor.css', array ("customize-controls"), "0.1" );
             wp_enqueue_script("live-editor", LIVE_EDITOR_INC_URL . 'js/live-editor.js', array ("jquery", "utils", "wp-lists", "suggest", "media-upload" ), "0.1" );
 
             $args = apply_filters ( 'live_editor_js_vars', array (
-                "metabox_transports"       => $this->metabox_transports
+                "metabox_transports"       => $live_editor->metabox_transports
             ) );
 
             wp_localize_script( "live-editor", "liveEditor", $args);
@@ -119,14 +122,44 @@ if ( ! class_exists ( 'WP_LiveEditor_Template' ) ) :
 
 
         public function do_start() {
+            global $post_type, $post;
+
+            $this->do_edit_post_header();
+            $this->do_edit_form_advanced();
+
+            do_action('add_meta_boxes', $post_type, $post);
+            do_action('add_meta_boxes_' . $post_type, $post);
+
+
+        }
+        public function do_controls() {
+            global $post_type, $post;
+
+            do_action('do_meta_boxes', $post_type, 'normal', $post);
+            do_action('do_meta_boxes', $post_type, 'advanced', $post);
+            do_action('do_meta_boxes', $post_type, 'side', $post);
+
+            if ( 'page' == $post_type )
+                do_action('submitpage_box');
+            else
+                do_action('submitpost_box');
+
+            $this->do_meta_boxes($post_type, 'side', $post);
+            $this->do_meta_boxes($post_type, 'normal', $post);
+            $this->do_meta_boxes($post_type, 'advanced', $post);
+        }
+
+        public function after_admin_controls() {
+            ?>
+            </form>
+            <?
+        }
+
+        protected function do_edit_post_header() {
             // Go ahead and load all admin globals
-            global $title, $parent_file, $post_id, $post;
+            global $title, $parent_file, $post_id, $post, $action;
 
             wp_enqueue_script('post');
-
-            /**
-             * START EDIT POST HEADER
-             */
 
             $parent_file = 'edit.php';
             $submenu_file = 'edit.php';
@@ -203,9 +236,11 @@ if ( ! class_exists ( 'WP_LiveEditor_Template' ) ) :
                 enqueue_comment_hotkeys_js();
             }
 
-            /**
-             * START EDIT FORM ADVANCED
-             */
+        }
+
+        protected function do_edit_form_advanced() {
+            global $post_id, $post, $post_type;
+
             /**
              * Post ID global
              * @name $post_ID
@@ -213,8 +248,6 @@ if ( ! class_exists ( 'WP_LiveEditor_Template' ) ) :
              */
             global $current_user;
             if ( ! isset($current_user) ) $current_user = wp_get_current_user();
-            //$post_ID = isset($post_ID) ? (int) $post_ID : 0;
-            //$user_ID = isset($user_ID) ? (int) $user_ID : 0;
             $post_ID = $post_id;
 
             $messages = array();
@@ -260,14 +293,8 @@ if ( ! class_exists ( 'WP_LiveEditor_Template' ) ) :
                     $message = $messages['post'][$_GET['message']];
             }
 
-            $notice = false;
-            if ( 'auto-draft' == get_post_status( $post ) ) {
-                if ( 'edit' == $action )
-                    $post->post_title = '';
-                $autosave = false;
-            } else {
-                $autosave = wp_get_post_autosave( $post_ID );
-            }
+            if ( $message )
+                $this->admin_notice = "<div id='message' class='updated'><p>$message</p></div>";
 
         }
 
@@ -277,9 +304,9 @@ if ( ! class_exists ( 'WP_LiveEditor_Template' ) ) :
             <a class="button" href="<?php echo $live_editor->settings->switch_url(); ?>" style="
                position: absolute;
                 bottom: 9px;
-                right: 16px;
+                right: 16px
                ">
-                <?php _e( 'Switch interface' ); ?>
+                <?php _e( 'Switch interface', 'live-editor' ); ?>
             </a>
             <?php
         }
@@ -336,33 +363,6 @@ if ( ! class_exists ( 'WP_LiveEditor_Template' ) ) :
             <input type="hidden" name="post_title" id="hidden_title">
             <input type="hidden" name="content" id="hidden_content">
             <?php
-        }
-
-        public function after_admin_controls() {
-            ?>
-            </form>
-            <?
-        }
-
-        public function do_controls() {
-            global $post_type, $post;
-
-            do_action('add_meta_boxes', $post_type, $post);
-            do_action('add_meta_boxes_' . $post_type, $post);
-
-            do_action('do_meta_boxes', $post_type, 'normal', $post);
-            do_action('do_meta_boxes', $post_type, 'advanced', $post);
-            do_action('do_meta_boxes', $post_type, 'side', $post);
-
-            if ( 'page' == $post_type )
-                do_action('submitpage_box');
-            else
-                do_action('submitpost_box');
-
-            $this->do_meta_boxes($post_type, 'side', $post);
-            $this->do_meta_boxes($post_type, 'normal', $post);
-            $this->do_meta_boxes($post_type, 'advanced', $post);
-
         }
 
         /**

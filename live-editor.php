@@ -1,7 +1,7 @@
 <?php
 /*
   Plugin Name: Live Editor
-  Plugin URI: http://trenvo.com
+  Plugin URI: http://trenvo.com/live-editor
   Description: Front-end editing with back-end flexibility
   Version: 0.1
   Author: Mike Martel
@@ -85,8 +85,6 @@ if ( !class_exists ( 'WP_LiveEditor' ) ) :
                 'false',
                 array ( 'post.php', 'post-new.php' )
             );
-
-            require_once ( LIVE_EDITOR_DIR . 'lib/class.wp-help-pointers.php' );
 
             // Make sure we redirect to the right editing interface
             if ( isset ( $_POST['action'] ) && $_POST['action'] == "editpost" )
